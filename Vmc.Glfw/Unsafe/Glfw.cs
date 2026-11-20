@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw.Unsafe;
 
-internal static class Glfw
+internal static partial class Glfw
 {
     private const string DllName = "GLFW";
 
