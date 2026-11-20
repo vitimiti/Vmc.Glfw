@@ -59,4 +59,7 @@ internal static partial class Glfw
     public const int Win32KeyboardMenu = 0x0002_5001;
     public const int Win32ShowDefault = 0x0002_5002;
     public const int WaylandAppID = 0x0002_6001;
+    public const int WaylandPreferLibDecor = 0x0003_8001;
+    public const int WaylandDisableLibDecor = 0x0003_8002;
+    public const int AnyPosition = unchecked((int)0x8000_0000);
 }
