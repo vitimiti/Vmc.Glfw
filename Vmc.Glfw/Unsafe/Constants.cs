@@ -62,4 +62,12 @@ internal static partial class Glfw
     public const int WaylandPreferLibDecor = 0x0003_8001;
     public const int WaylandDisableLibDecor = 0x0003_8002;
     public const int AnyPosition = unchecked((int)0x8000_0000);
+    public const int JoystickHatButtons = 0x0005_0001;
+    public const int AnglePlatformType = 0x0005_0002;
+    public const int Platform = 0x0005_0003;
+    public const int CocoaChDirResources = 0x0005_1001;
+    public const int CocoaMenubar = 0x0005_1002;
+    public const int X11XcbVulkanSurface = 0x0005_2001;
+    public const int WaylandLibDecor = 0x0005_3001;
+    public const int DontCare = -1;
 }
