@@ -6,7 +6,7 @@
 namespace Vmc.Glfw;
 
 [Flags]
-public enum HatState
+public enum HatStates
 {
     None = 0,
     Centered = None,
