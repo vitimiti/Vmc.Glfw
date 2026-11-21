@@ -5,8 +5,18 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the type of connection event.
+/// </summary>
 public enum ConnectionEventType
 {
+    /// <summary>
+    /// The connection was established.
+    /// </summary>
     Connected = 0x0004_0001,
+
+    /// <summary>
+    /// The connection was lost.
+    /// </summary>
     Disconnected,
 }

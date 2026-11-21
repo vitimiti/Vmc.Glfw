@@ -11,10 +11,16 @@ using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the native context for GLFW.
+/// </summary>
 public sealed class NativeContext : IDisposable
 {
     private bool _disposed;
 
+    /// <summary>
+    /// Gets the version of the GLFW library.
+    /// </summary>
     public static Version Version
     {
         get
@@ -24,6 +30,9 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the version string of the GLFW library.
+    /// </summary>
     public static unsafe string VersionString
     {
         get
@@ -32,6 +41,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the platform of the GLFW library.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Platform Platform
     {
         get
@@ -43,6 +57,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether raw mouse motion is supported.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool RawMouseMotionSupported
     {
         get
@@ -54,6 +73,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the current time of the GLFW library.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public TimeSpan Time
     {
         get
@@ -71,6 +95,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the current value of the GLFW timer.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ulong TimerValue
     {
         get
@@ -82,6 +111,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the frequency of the GLFW timer.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ulong TimerFrequency
     {
         get
@@ -93,6 +127,11 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the current GLFW context.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe Window? CurrentContext
     {
         get
@@ -104,6 +143,10 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of the native context.
+    /// </summary>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     internal NativeContext()
     {
         Unsafe.Glfw.Init();
@@ -112,6 +155,10 @@ public sealed class NativeContext : IDisposable
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 
+    /// <summary>
+    /// Disposes the native context and releases all associated resources.
+    /// </summary>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Dispose()
     {
         if (_disposed)
@@ -124,6 +171,13 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Determines whether the specified platform is supported by GLFW.
+    /// </summary>
+    /// <param name="platform">The platform to check.</param>
+    /// <returns><see langword="true"/> if the platform is supported; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsPlatformSupported(Platform platform)
     {
         ThrowIfDisposed();
@@ -132,6 +186,12 @@ public sealed class NativeContext : IDisposable
         return supported;
     }
 
+    /// <summary>
+    /// Gets the list of available monitors.
+    /// </summary>
+    /// <returns>A read-only collection of monitors, or <see langword="null"/> if no monitors are available.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe ReadOnlyCollection<Monitor>? GetMonitors()
     {
         ThrowIfDisposed();
@@ -160,6 +220,12 @@ public sealed class NativeContext : IDisposable
         return new ReadOnlyCollection<Monitor>(monitorList);
     }
 
+    /// <summary>
+    /// Gets the primary monitor.
+    /// </summary>
+    /// <returns>The primary monitor, or <see langword="null"/> if no primary monitor is available.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe Monitor? GetPrimaryMonitor()
     {
         ThrowIfDisposed();
@@ -168,12 +234,23 @@ public sealed class NativeContext : IDisposable
         return monitor is null ? null : new Monitor(monitor);
     }
 
+    /// <summary>
+    /// Creates a new window builder.
+    /// </summary>
+    /// <returns>A new instance of <see cref="WindowBuilder"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public WindowBuilder CreateWindowBuilder()
     {
         ThrowIfDisposed();
         return new WindowBuilder();
     }
 
+    /// <summary>
+    /// Processes all pending events.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void PollEvents()
     {
         ThrowIfDisposed();
@@ -181,6 +258,11 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Waits for events to be processed.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void WaitEvents()
     {
         ThrowIfDisposed();
@@ -188,6 +270,12 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Waits for events to be processed with a specified timeout.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait for events.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void WaitEventsTimeout(TimeSpan timeout)
     {
         ThrowIfDisposed();
@@ -195,6 +283,11 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Posts an empty event to the event queue.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void PostEmptyEvent()
     {
         ThrowIfDisposed();
@@ -202,6 +295,14 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Gets the name of the specified key.
+    /// </summary>
+    /// <param name="key">The key to get the name for.</param>
+    /// <param name="scancode">The scancode of the key.</param>
+    /// <returns>The name of the key, or <see langword="null"/> if the key has no name.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe string? GetKeyName(Key key, int scancode)
     {
         ThrowIfDisposed();
@@ -210,6 +311,13 @@ public sealed class NativeContext : IDisposable
         return keyName is null ? null : Marshal.PtrToStringAnsi((nint)keyName);
     }
 
+    /// <summary>
+    /// Gets the scancode of the specified key.
+    /// </summary>
+    /// <param name="key">The key to get the scancode for.</param>
+    /// <returns>The scancode of the key.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public int GetKeyScancode(Key key)
     {
         ThrowIfDisposed();
@@ -218,6 +326,14 @@ public sealed class NativeContext : IDisposable
         return scancode;
     }
 
+    /// <summary>
+    /// Creates a new cursor with the specified image and hotspot.
+    /// </summary>
+    /// <param name="image">The image for the cursor.</param>
+    /// <param name="hotspot">The hotspot of the cursor.</param>
+    /// <returns>A new instance of <see cref="Cursor"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe Cursor CreateCursor(Image image, Point hotspot)
     {
         ThrowIfDisposed();
@@ -235,6 +351,13 @@ public sealed class NativeContext : IDisposable
         return new Cursor(cursor);
     }
 
+    /// <summary>
+    /// Creates a standard cursor with the specified shape.
+    /// </summary>
+    /// <param name="shape">The shape of the cursor.</param>
+    /// <returns>A new instance of <see cref="Cursor"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe Cursor CreateStandardCursor(CursorShape shape)
     {
         ThrowIfDisposed();
@@ -243,12 +366,25 @@ public sealed class NativeContext : IDisposable
         return new Cursor(cursor);
     }
 
+    /// <summary>
+    /// Gets the joystick with the specified ID.
+    /// </summary>
+    /// <param name="id">The ID of the joystick.</param>
+    /// <returns>A new instance of <see cref="Joystick"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Joystick GetJoystick(JoystickID id)
     {
         ThrowIfDisposed();
         return new Joystick(id);
     }
 
+    /// <summary>
+    /// Sets the swap interval for the current context.
+    /// </summary>
+    /// <param name="interval">The swap interval.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetSwapInterval(int interval)
     {
         ThrowIfDisposed();
@@ -256,6 +392,13 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Checks if the specified extension is supported.
+    /// </summary>
+    /// <param name="extension">The name of the extension.</param>
+    /// <returns><see langword="true"/> if the extension is supported; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe bool IsExtensionSupported(string extension)
     {
         ThrowIfDisposed();
@@ -273,6 +416,14 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the function pointer for the specified OpenGL or Vulkan function.
+    /// </summary>
+    /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+    /// <param name="procname">The name of the function.</param>
+    /// <returns>A delegate representing the function.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the context has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public unsafe TDelegate GetProcess<TDelegate>(string procname)
         where TDelegate : Delegate
     {

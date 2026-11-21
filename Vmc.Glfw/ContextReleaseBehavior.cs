@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the context release behavior.
+/// </summary>
 public enum ContextReleaseBehavior
 {
+    /// <summary>
+    /// The context release behavior is any.
+    /// </summary>
     Any,
+
+    /// <summary>
+    /// The context release behavior is flush.
+    /// </summary>
     Flush = 0x0003_5001,
+
+    /// <summary>
+    /// The context release behavior is none.
+    /// </summary>
     None,
 }

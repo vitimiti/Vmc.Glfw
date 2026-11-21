@@ -11,15 +11,75 @@ using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents a window in the GLFW context.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="position">The new position of the window.</param>
 public delegate void WindowPositionCallback(Window window, Point position);
+
+/// <summary>
+/// Represents a callback for when the window is resized.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="size">The new size of the window.</param>
 public delegate void WindowSizeCallback(Window window, Size size);
+
+/// <summary>
+/// Represents a callback for when the window is closed.
+/// </summary>
+/// <param name="window">The window instance.</param>
 public delegate void WindowCloseCallback(Window window);
+
+/// <summary>
+/// Represents a callback for when the window is refreshed.
+/// </summary>
+/// <param name="window">The window instance.</param>
 public delegate void WindowRefreshCallback(Window window);
+
+/// <summary>
+/// Represents a callback for when the window gains or loses focus.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="focused">Indicates whether the window is focused.</param>
 public delegate void WindowFocusCallback(Window window, bool focused);
+
+/// <summary>
+/// Represents a callback for when the window is iconified.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="iconified">Indicates whether the window is iconified.</param>
 public delegate void WindowIconifyCallback(Window window, bool iconified);
+
+/// <summary>
+/// Represents a callback for when the window is maximized.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="maximized">Indicates whether the window is maximized.</param>
 public delegate void WindowMaximizeCallback(Window window, bool maximized);
+
+/// <summary>
+/// Represents a callback for when the framebuffer size changes.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="size">The new size of the framebuffer.</param>
 public delegate void FramebufferSizeCallback(Window window, Size size);
+
+/// <summary>
+/// Represents a callback for when the window content scale changes.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="scale">The new content scale of the window.</param>
 public delegate void WindowContentScaleCallback(Window window, Vector2 scale);
+
+/// <summary>
+/// Represents a callback for when a key is pressed, repeated, or released.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="key">The key that was pressed or released.</param>
+/// <param name="scancode">The platform-specific scancode of the key.</param>
+/// <param name="action">The action (press, release, repeat).</param>
+/// <param name="mods">The modifier keys active during the event.</param>
 public delegate void KeyCallback(
     Window window,
     Key key,
@@ -27,19 +87,70 @@ public delegate void KeyCallback(
     KeyAction action,
     KeyModifiers mods
 );
+
+/// <summary>
+/// Represents a callback for when a character is input.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="codepoint">The Unicode codepoint of the character.</param>
 public delegate void CharCallback(Window window, uint codepoint);
+
+/// <summary>
+/// Represents a callback for when a character is input with modifier keys.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="codepoint">The Unicode codepoint of the character.</param>
+/// <param name="mods">The modifier keys active during the event.</param>
 public delegate void CharModsCallback(Window window, uint codepoint, KeyModifiers mods);
+
+/// <summary>
+/// Represents a callback for when a mouse button is pressed or released.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="button">The mouse button that was pressed or released.</param>
+/// <param name="action">The action (press or release).</param>
+/// <param name="mods">The modifier keys active during the event.</param>
 public delegate void MouseButtonCallback(
     Window window,
     MouseButton button,
     ButtonAction action,
     KeyModifiers mods
 );
+
+/// <summary>
+/// Represents a callback for when the cursor position changes.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="position">The new cursor position.</param>
 public delegate void CursorPositionCallback(Window window, PointF position);
+
+/// <summary>
+/// Represents a callback for when the cursor enters or leaves the window.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="entered">Indicates whether the cursor entered (true) or left (false) the window.</param>
 public delegate void CursorEnterCallback(Window window, bool entered);
+
+/// <summary>
+/// Represents a callback for when the scroll wheel is used.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="offset">The scroll offset.</param>
 public delegate void ScrollCallback(Window window, Vector2 offset);
+
+/// <summary>
+/// Represents a callback for when files are dropped onto the window.
+/// </summary>
+/// <param name="window">The window instance.</param>
+/// <param name="paths">The paths of the dropped files.</param>
 public delegate void DropCallback(Window window, string[] paths);
 
+/// <summary>
+/// Represents a window instance.
+/// </summary>
+/// <remarks>
+/// This class implements <see cref="IDisposable"/>.
+/// </remarks>
 public sealed unsafe class Window : IDisposable
 {
     private static readonly CallbacksWrapper Callbacks = new();
@@ -49,8 +160,16 @@ public sealed unsafe class Window : IDisposable
     private GCHandle _gcHandle;
     private bool _disposed;
 
+    /// <summary>
+    /// Gets the native handle of the window.
+    /// </summary>
     internal Unsafe.Glfw.Window* Handle { get; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the window should close.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool ShouldClose
     {
         get
@@ -68,6 +187,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the title of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string Title
     {
         get
@@ -94,6 +218,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the position of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Point Position
     {
         get
@@ -111,6 +240,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the size of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Size Size
     {
         get
@@ -128,6 +262,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the size of the framebuffer.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Size FramebufferSize
     {
         get
@@ -139,6 +278,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the size of the window frame.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public (int Left, int Top, int Right, int Bottom) FrameSize
     {
         get
@@ -156,6 +300,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the content scale of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Vector2 ContentScale
     {
         get
@@ -167,6 +316,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the opacity of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public float Opacity
     {
         get
@@ -186,6 +340,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the monitor that the window is currently on, if any.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Monitor? Monitor
     {
         get
@@ -197,6 +356,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is focused.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Focused
     {
         get
@@ -214,6 +378,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is iconified (minimized).
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Iconified
     {
         get
@@ -231,6 +400,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is resizable.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Resizable
     {
         get
@@ -248,6 +422,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is visible.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Visible
     {
         get
@@ -265,6 +444,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is decorated.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Decorated
     {
         get
@@ -282,6 +466,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window auto-iconifies.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool AutoIconify
     {
         get
@@ -299,6 +488,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is floating.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Floating
     {
         get
@@ -316,6 +510,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window is maximized.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Maximized
     {
         get
@@ -333,6 +532,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window has a transparent framebuffer.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool TransparentFramebuffer
     {
         get
@@ -353,6 +557,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets whether the window is hovered.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool Hovered
     {
         get
@@ -364,6 +573,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window should take focus when shown.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool FocusOnShow
     {
         get
@@ -381,6 +595,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window has mouse passthrough enabled.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool HasMousePassthrough
     {
         get
@@ -401,6 +620,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the cursor input mode for the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public CursorInputMode CursorInputMode
     {
         get
@@ -418,6 +642,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window has sticky keys enabled.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool HasStickyKeys
     {
         get
@@ -435,6 +664,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window has sticky mouse buttons enabled.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool HasStickyMouseButtons
     {
         get
@@ -455,6 +689,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window locks key mods.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool LocksKeyMods
     {
         get
@@ -472,6 +711,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether the window has raw mouse motion enabled.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool HasRawMouseMotion
     {
         get
@@ -489,6 +733,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets whether the window has double buffering enabled.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool HasDoubleBuffer
     {
         get
@@ -500,6 +749,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the client API used by the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ClientApi ClientApi
     {
         get
@@ -511,6 +765,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the context version of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Version ContextVersion
     {
         get
@@ -526,6 +785,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the context robustness of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ContextRobustness ContextRobustness
     {
         get
@@ -537,6 +801,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets whether the OpenGL context is forward compatible.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsOpenGLForwardCompatible
     {
         get
@@ -551,6 +820,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets whether the OpenGL context is a debug context.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsContextDebug
     {
         get
@@ -562,6 +836,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the OpenGL profile of the context.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public OpenGLProfile OpenGLProfile
     {
         get
@@ -573,6 +852,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the context release behavior of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ContextReleaseBehavior ContextReleaseBehavior
     {
         get
@@ -584,6 +868,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets whether the context has the no-error flag set.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsContextNoError
     {
         get
@@ -595,6 +884,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the context creation API of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ContextCreationApi ContextCreationApi
     {
         get
@@ -606,6 +900,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the cursor position of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public PointF CursorPosition
     {
         get
@@ -625,6 +924,11 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the clipboard string of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string ClipboardString
     {
         get
@@ -651,6 +955,12 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of the Window class with the specified handle and ownership flag.
+    /// </summary>
+    /// <param name="handle">The native GLFW window handle.</param>
+    /// <param name="isOwned">Indicates whether the window instance owns the native handle.</param>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     internal Window(Unsafe.Glfw.Window* handle, bool isOwned = true)
     {
         Handle = handle;
@@ -962,6 +1272,10 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Disposes the window and releases its resources.
+    /// </summary>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Dispose()
     {
         if (_disposed || !_isOwned)
@@ -1039,6 +1353,12 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    /// <summary>
+    /// Sets the icon of the window.
+    /// </summary>
+    /// <param name="images">A collection of images to use as the window icon.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetIcon(IReadOnlyCollection<Image> images)
     {
         ThrowIfDisposed();
@@ -1066,6 +1386,13 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the size limits of the window.
+    /// </summary>
+    /// <param name="minSize">The minimum size of the window.</param>
+    /// <param name="maxSize">The maximum size of the window.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetSizeLimits(Size minSize, Size maxSize)
     {
         ThrowIfDisposed();
@@ -1079,6 +1406,13 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the aspect ratio of the window.
+    /// </summary>
+    /// <param name="numer">The numerator of the aspect ratio.</param>
+    /// <param name="denom">The denominator of the aspect ratio.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetAspectRatio(int numer, int denom)
     {
         ThrowIfDisposed();
@@ -1086,6 +1420,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Iconifies the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Iconify()
     {
         ThrowIfDisposed();
@@ -1093,6 +1432,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Restores the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Restore()
     {
         ThrowIfDisposed();
@@ -1100,6 +1444,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Maximizes the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Maximize()
     {
         ThrowIfDisposed();
@@ -1107,6 +1456,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Shows the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Show()
     {
         ThrowIfDisposed();
@@ -1114,6 +1468,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Hides the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Hide()
     {
         ThrowIfDisposed();
@@ -1121,6 +1480,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Focuses the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Focus()
     {
         ThrowIfDisposed();
@@ -1128,6 +1492,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Requests attention for the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void RequestAttention()
     {
         ThrowIfDisposed();
@@ -1135,6 +1504,15 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the monitor, position, size, and refresh rate of the window.
+    /// </summary>
+    /// <param name="monitor">The monitor to set, or <see langword="null"/> for windowed mode.</param>
+    /// <param name="position">The position of the window.</param>
+    /// <param name="size">The size of the window.</param>
+    /// <param name="refreshRate">The refresh rate of the window.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetMonitor(Monitor? monitor, Point position, Size size, int refreshRate)
     {
         ThrowIfDisposed();
@@ -1151,6 +1529,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the position callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetPositionCallback(WindowPositionCallback? callback)
     {
         ThrowIfDisposed();
@@ -1162,6 +1546,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the size callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetSizeCallback(WindowSizeCallback? callback)
     {
         ThrowIfDisposed();
@@ -1173,6 +1563,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the close callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCloseCallback(WindowCloseCallback? callback)
     {
         ThrowIfDisposed();
@@ -1184,6 +1580,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the refresh callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetRefreshCallback(WindowRefreshCallback? callback)
     {
         ThrowIfDisposed();
@@ -1195,6 +1597,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the focus callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetFocusCallback(WindowFocusCallback? callback)
     {
         ThrowIfDisposed();
@@ -1206,6 +1614,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the iconify callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetIconifyCallback(WindowIconifyCallback? callback)
     {
         ThrowIfDisposed();
@@ -1217,6 +1631,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the maximize callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetMaximizeCallback(WindowMaximizeCallback? callback)
     {
         ThrowIfDisposed();
@@ -1228,6 +1648,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the framebuffer size callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetFramebufferSizeCallback(FramebufferSizeCallback? callback)
     {
         ThrowIfDisposed();
@@ -1239,6 +1665,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the content scale callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetContentScaleCallback(WindowContentScaleCallback? callback)
     {
         ThrowIfDisposed();
@@ -1250,6 +1682,13 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Gets the action of the specified key.
+    /// </summary>
+    /// <param name="key">The key to query.</param>
+    /// <returns>The action of the key.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public KeyAction GetKey(Key key)
     {
         ThrowIfDisposed();
@@ -1258,6 +1697,13 @@ public sealed unsafe class Window : IDisposable
         return action;
     }
 
+    /// <summary>
+    /// Gets the action of the specified mouse button.
+    /// </summary>
+    /// <param name="button">The mouse button to query.</param>
+    /// <returns>The action of the mouse button.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ButtonAction GetMouseButton(MouseButton button)
     {
         ThrowIfDisposed();
@@ -1266,6 +1712,12 @@ public sealed unsafe class Window : IDisposable
         return action;
     }
 
+    /// <summary>
+    /// Sets the cursor for the window.
+    /// </summary>
+    /// <param name="cursor">The cursor to set, or <see langword="null"/> to remove the cursor.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCursor(Cursor? cursor)
     {
         ThrowIfDisposed();
@@ -1273,6 +1725,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the key callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetKeyCallback(KeyCallback? callback)
     {
         ThrowIfDisposed();
@@ -1281,6 +1739,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the character callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCharCallback(CharCallback? callback)
     {
         ThrowIfDisposed();
@@ -1289,6 +1753,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the character with modifiers callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCharModsCallback(CharModsCallback? callback)
     {
         ThrowIfDisposed();
@@ -1297,6 +1767,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the mouse button callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetMouseButtonCallback(MouseButtonCallback? callback)
     {
         ThrowIfDisposed();
@@ -1308,6 +1784,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the cursor position callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCursorPositionCallback(CursorPositionCallback? callback)
     {
         ThrowIfDisposed();
@@ -1319,6 +1801,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the cursor enter callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCursorEnterCallback(CursorEnterCallback? callback)
     {
         ThrowIfDisposed();
@@ -1330,6 +1818,12 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Sets the scroll callback for the window.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetScrollCallback(ScrollCallback? callback)
     {
         ThrowIfDisposed();
@@ -1338,6 +1832,11 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Makes the OpenGL or OpenGL ES context of the window current on the calling thread.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void MakeContextCurrent()
     {
         ThrowIfDisposed();
@@ -1345,17 +1844,15 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Swaps the front and back buffers of the window.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SwapBuffers()
     {
         ThrowIfDisposed();
         Unsafe.Glfw.SwapBuffers(Handle);
-        Utilities.CheckError();
-    }
-
-    public void SwapInterval(int interval)
-    {
-        ThrowIfDisposed();
-        Unsafe.Glfw.SwapInterval(interval);
         Utilities.CheckError();
     }
 

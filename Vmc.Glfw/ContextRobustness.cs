@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the context robustness strategy.
+/// </summary>
 public enum ContextRobustness
 {
+    /// <summary>
+    /// No robustness strategy is used.
+    /// </summary>
     None,
+
+    /// <summary>
+    /// The context will not be notified of resets.
+    /// </summary>
     NoResetNotification = 0x0003_1001,
+
+    /// <summary>
+    /// The context will be lost on reset.
+    /// </summary>
     LoseContextOnReset,
 }

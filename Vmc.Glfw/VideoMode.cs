@@ -7,6 +7,12 @@ using System.Drawing;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents a video mode.
+/// </summary>
+/// <param name="Size">The resolution of the video mode.</param>
+/// <param name="BitsPerPixel">The color depth of the video mode.</param>
+/// <param name="RefreshRate">The refresh rate of the video mode.</param>
 public sealed record VideoMode(
     Size Size,
     (int Red, int Green, int Blue) BitsPerPixel,

@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the context creation API type.
+/// </summary>
 public enum ContextCreationApi
 {
+    /// <summary>
+    /// Use the native context creation API.
+    /// </summary>
     Native = 0x0003_6001,
+
+    /// <summary>
+    /// Use the EGL context creation API.
+    /// </summary>
     Egl,
+
+    /// <summary>
+    /// Use the OSMesa context creation API.
+    /// </summary>
     OsMesa,
 }

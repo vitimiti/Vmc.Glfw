@@ -7,5 +7,16 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents an exception that occurs in the native context.
+/// </summary>
+/// <param name="errorCode">The error code associated with the exception.</param>
+/// <param name="message">The error message.</param>
 public class NativeContextException(ErrorCode errorCode, string? message)
-    : ExternalException(message, (int)errorCode);
+    : ExternalException(message, (int)errorCode)
+{
+    /// <summary>
+    /// Gets the native error code associated with the exception.
+    /// </summary>
+    public ErrorCode NativeErrorCode => (ErrorCode)HResult;
+}

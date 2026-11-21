@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the action of a button.
+/// </summary>
 public enum ButtonAction
 {
+    /// <summary>
+    /// The button is released.
+    /// </summary>
     Release,
+
+    /// <summary>
+    /// The button is pressed.
+    /// </summary>
     Press,
+
+    /// <summary>
+    /// The button is repeated.
+    /// </summary>
     Repeat,
 }

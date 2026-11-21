@@ -11,8 +11,19 @@ using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents a callback for monitor connection events.
+/// </summary>
+/// <param name="monitor">The monitor that triggered the event.</param>
+/// <param name="eventType">The type of connection event.</param>
 public delegate void MonitorCallback(Monitor monitor, ConnectionEventType eventType);
 
+/// <summary>
+/// Represents a monitor.
+/// </summary>
+/// <remarks>
+/// This class implements <see cref="IDisposable"/>.
+/// </remarks>
 public sealed unsafe class Monitor : IDisposable
 {
     private static readonly CallbacksWrapper Callbacks = new();
@@ -22,8 +33,16 @@ public sealed unsafe class Monitor : IDisposable
     private GCHandle _gcHandle;
     private bool _disposed;
 
+    /// <summary>
+    /// Gets the handle to the underlying GLFW monitor.
+    /// </summary>
     internal Unsafe.Glfw.Monitor* Handle { get; }
 
+    /// <summary>
+    /// Gets the position of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Point Position
     {
         get
@@ -35,6 +54,11 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the work area of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Rectangle WorkArea
     {
         get
@@ -52,6 +76,11 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the physical size of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public Size PhysicalSize
     {
         get
@@ -63,6 +92,11 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the content scale of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public (float X, float Y) ContentScale
     {
         get
@@ -74,6 +108,11 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the name of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string Name
     {
         get
@@ -85,6 +124,11 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the gamma ramp of the monitor.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public GammaRamp GammaRamp
     {
         get
@@ -102,10 +146,10 @@ public sealed unsafe class Monitor : IDisposable
         set
         {
             ThrowIfDisposed();
-            var rampCount = value.Red.Length;
-            var redSpan = value.Red.AsSpan();
-            var greenSpan = value.Green.AsSpan();
-            var blueSpan = value.Blue.AsSpan();
+            var rampCount = value.Red.Count;
+            var redSpan = value.Red.ToArray().AsSpan();
+            var greenSpan = value.Green.ToArray().AsSpan();
+            var blueSpan = value.Blue.ToArray().AsSpan();
             var ramp = new Unsafe.Glfw.GammaRamp
             {
                 Red = (ushort*)SysUnsafe.AsPointer(ref redSpan),
@@ -119,6 +163,12 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="Monitor"/> class.
+    /// </summary>
+    /// <param name="handle">The handle to the underlying GLFW monitor.</param>
+    /// <param name="isOwned">Indicates whether the monitor is owned by this instance.</param>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     internal Monitor(Unsafe.Glfw.Monitor* handle, bool isOwned = true)
     {
         Handle = handle;
@@ -152,6 +202,10 @@ public sealed unsafe class Monitor : IDisposable
         wrapper.Callback?.Invoke(unownedMonitor, eventType);
     }
 
+    /// <summary>
+    /// Disposes the monitor and releases any associated resources.
+    /// </summary>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void Dispose()
     {
         if (_disposed || !_isOwned)
@@ -181,13 +235,12 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
-    public static void SetCallback(MonitorCallback? callback)
-    {
-        Callbacks.Callback = callback;
-        Unsafe.Glfw.SetMonitorCallback(callback is null ? null : &MonitorCallbackHandler);
-        Utilities.CheckError();
-    }
-
+    /// <summary>
+    /// Gets the available video modes for the monitor.
+    /// </summary>
+    /// <returns>A read-only collection of video modes, or <see langword="null"/> if no modes are available.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public ReadOnlyCollection<VideoMode>? GetVideoModes()
     {
         ThrowIfDisposed();
@@ -217,6 +270,12 @@ public sealed unsafe class Monitor : IDisposable
         return new ReadOnlyCollection<VideoMode>(videoModes);
     }
 
+    /// <summary>
+    /// Gets the current video mode of the monitor.
+    /// </summary>
+    /// <returns>The current video mode.</returns>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public VideoMode GetCurrentVideoMode()
     {
         ThrowIfDisposed();
@@ -229,10 +288,30 @@ public sealed unsafe class Monitor : IDisposable
         );
     }
 
+    /// <summary>
+    /// Sets the gamma value for the monitor.
+    /// </summary>
+    /// <param name="gamma">The gamma value to set.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetGamma(float gamma)
     {
         ThrowIfDisposed();
         Unsafe.Glfw.SetGamma(Handle, gamma);
+        Utilities.CheckError();
+    }
+
+    /// <summary>
+    /// Sets the global monitor callback.
+    /// </summary>
+    /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
+    /// <exception cref="ObjectDisposedException">Thrown if the monitor has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
+    public void SetCallback(MonitorCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.Callback = callback;
+        Unsafe.Glfw.SetMonitorCallback(callback is null ? null : &MonitorCallbackHandler);
         Utilities.CheckError();
     }
 

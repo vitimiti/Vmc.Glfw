@@ -5,11 +5,20 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the state of a gamepad, including its buttons and axes.
+/// </summary>
+/// <param name="Buttons">The collection of button actions for the gamepad.</param>
+/// <param name="Axes">The collection of axis values for the gamepad.</param>
 public sealed record GamepadState(
     IReadOnlyCollection<ButtonAction> Buttons,
     IReadOnlyCollection<float> Axes
 )
 {
+    /// <summary>
+    /// Gets the collection of button actions for the gamepad.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the buttons collection does not have exactly 15 elements.</exception>
     public IReadOnlyCollection<ButtonAction> Buttons { get; } =
         Buttons.Count != 15
             ? throw new ArgumentException(
@@ -18,6 +27,10 @@ public sealed record GamepadState(
             )
             : Buttons;
 
+    /// <summary>
+    /// Gets the collection of axis values for the gamepad.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the axes collection does not have exactly 6 elements.</exception>
     public IReadOnlyCollection<float> Axes { get; } =
         Axes.Count != 6
             ? throw new ArgumentException(

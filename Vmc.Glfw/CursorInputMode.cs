@@ -5,10 +5,28 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the input mode of a cursor.
+/// </summary>
 public enum CursorInputMode
 {
+    /// <summary>
+    /// The cursor is in normal mode.
+    /// </summary>
     Normal = 0x0003_4001,
+
+    /// <summary>
+    /// The cursor is hidden.
+    /// </summary>
     Hidden,
+
+    /// <summary>
+    /// The cursor is disabled.
+    /// </summary>
     Disabled,
+
+    /// <summary>
+    /// The cursor is captured.
+    /// </summary>
     Captured,
 }

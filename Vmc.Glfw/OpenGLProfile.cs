@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the OpenGL profile.
+/// </summary>
 public enum OpenGLProfile
 {
+    /// <summary>
+    /// Represents any OpenGL profile.
+    /// </summary>
     Any,
+
+    /// <summary>
+    /// Represents the core OpenGL profile.
+    /// </summary>
     Core = 0x0003_2001,
+
+    /// <summary>
+    /// Represents the compatibility OpenGL profile.
+    /// </summary>
     Compat,
 }

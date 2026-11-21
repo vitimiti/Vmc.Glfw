@@ -5,20 +5,42 @@
 
 namespace Vmc.Glfw;
 
-public sealed record GammaRamp(ushort[] Red, ushort[] Green, ushort[] Blue)
+/// <summary>
+/// Represents a gamma ramp, which defines the mapping of input color values to output color values for red, green, and blue channels.
+/// </summary>
+/// <param name="Red">The collection of red channel values.</param>
+/// <param name="Green">The collection of green channel values.</param>
+/// <param name="Blue">The collection of blue channel values.</param>
+public sealed record GammaRamp(
+    IReadOnlyCollection<ushort> Red,
+    IReadOnlyCollection<ushort> Green,
+    IReadOnlyCollection<ushort> Blue
+)
 {
-    public ushort[] Red { get; } =
-        Red.Length != Green.Length || Red.Length != Blue.Length
-            ? throw new ArgumentException("All color arrays must have the same length.")
+    /// <summary>
+    /// Gets the collection of red channel values.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the color collections do not have the same length.</exception>
+    public IReadOnlyCollection<ushort> Red { get; } =
+        Red.Count != Green.Count || Red.Count != Blue.Count
+            ? throw new ArgumentException("All color collections must have the same length.")
             : Red;
 
-    public ushort[] Green { get; } =
-        Green.Length != Red.Length || Green.Length != Blue.Length
-            ? throw new ArgumentException("All color arrays must have the same length.")
+    /// <summary>
+    /// Gets the collection of green channel values.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the color collections do not have the same length.</exception>
+    public IReadOnlyCollection<ushort> Green { get; } =
+        Green.Count != Red.Count || Green.Count != Blue.Count
+            ? throw new ArgumentException("All color collections must have the same length.")
             : Green;
 
-    public ushort[] Blue { get; } =
-        Blue.Length != Red.Length || Blue.Length != Green.Length
-            ? throw new ArgumentException("All color arrays must have the same length.")
+    /// <summary>
+    /// Gets the collection of blue channel values.
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown if the color collections do not have the same length.</exception>
+    public IReadOnlyCollection<ushort> Blue { get; } =
+        Blue.Count != Red.Count || Blue.Count != Green.Count
+            ? throw new ArgumentException("All color collections must have the same length.")
             : Blue;
 }

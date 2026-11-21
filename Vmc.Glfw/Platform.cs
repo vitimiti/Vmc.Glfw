@@ -5,12 +5,38 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the platform.
+/// </summary>
 public enum Platform
 {
+    /// <summary>
+    /// Represents any platform.
+    /// </summary>
     Any = 0x0006_0000,
+
+    /// <summary>
+    /// Represents the Win32 platform.
+    /// </summary>
     Win32,
+
+    /// <summary>
+    /// Represents the Cocoa platform.
+    /// </summary>
     Cocoa,
+
+    /// <summary>
+    /// Represents the Wayland platform.
+    /// </summary>
     Wayland,
+
+    /// <summary>
+    /// Represents the X11 platform.
+    /// </summary>
     X11,
+
+    /// <summary>
+    /// Represents the Null platform.
+    /// </summary>
     Null,
 }

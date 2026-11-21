@@ -7,4 +7,9 @@ using System.Drawing;
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents an image with a specified size and pixel data.
+/// </summary>
+/// <param name="Size">The size of the image.</param>
+/// <param name="Pixels">The collection of pixel data.</param>
 public record Image(Size Size, IReadOnlyCollection<byte> Pixels);

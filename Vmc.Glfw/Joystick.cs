@@ -10,6 +10,12 @@ namespace Vmc.Glfw;
 
 public delegate void JoystickCallback(JoystickID jid, ConnectionEventType eventType);
 
+/// <summary>
+/// Represents a joystick device and provides access to its state and properties.
+/// </summary>
+/// <remarks>
+/// This class implements <see cref="IDisposable"/>.
+/// </remarks>
 public sealed unsafe class Joystick : IDisposable
 {
     private static readonly CallbacksHandler Callbacks = new();
@@ -19,17 +25,32 @@ public sealed unsafe class Joystick : IDisposable
     private GCHandle _gcHandle;
     private bool _disposed;
 
+    /// <summary>
+    /// Gets the identifier of the joystick.
+    /// </summary>
     public JoystickID Id { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether the joystick is currently connected.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsPresent
     {
         get
         {
             ThrowIfDisposed();
-            return Unsafe.Glfw.JoystickPresent(Id);
+            var result = Unsafe.Glfw.JoystickPresent(Id);
+            Utilities.CheckError();
+            return result;
         }
     }
 
+    /// <summary>
+    /// Gets the collection of joystick axes values.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public IReadOnlyCollection<float> Axes
     {
         get
@@ -47,6 +68,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the collection of joystick button states.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public IReadOnlyCollection<ButtonAction> Buttons
     {
         get
@@ -64,6 +90,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the collection of joystick hat switch states.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public IReadOnlyCollection<HatStates> Hats
     {
         get
@@ -81,6 +112,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the name of the joystick.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string? Name
     {
         get
@@ -92,6 +128,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the GUID of the joystick.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string? Guid
     {
         get
@@ -103,6 +144,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the joystick is recognized as a gamepad.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public bool IsGamepad
     {
         get
@@ -112,6 +158,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the name of the gamepad if the joystick is recognized as a gamepad.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public string? GamepadName
     {
         get
@@ -123,6 +174,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the current state of the gamepad if the joystick is recognized as a gamepad.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public GamepadState GamepadState
     {
         get
@@ -137,6 +193,12 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="Joystick"/> class.
+    /// </summary>
+    /// <param name="id">The identifier of the joystick.</param>
+    /// <param name="isOwned">Indicates whether the joystick instance owns the underlying resources.</param>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     internal Joystick(JoystickID id, bool isOwned = true)
     {
         Id = id;
@@ -156,6 +218,9 @@ public sealed unsafe class Joystick : IDisposable
         wrapper?.Callback?.Invoke(jid, eventType);
     }
 
+    /// <summary>
+    /// Disposes the joystick instance and releases any associated resources.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed || !_isOwned)
@@ -182,6 +247,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
+    /// <summary>
+    /// Sets the callback to be invoked when the joystick connection state changes.
+    /// </summary>
+    /// <param name="callback">The callback to set.</param>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void SetCallback(JoystickCallback? callback)
     {
         ThrowIfDisposed();
@@ -190,6 +260,13 @@ public sealed unsafe class Joystick : IDisposable
         Utilities.CheckError();
     }
 
+    /// <summary>
+    /// Updates the gamepad mappings with the specified mappings string.
+    /// </summary>
+    /// <param name="mappings">The gamepad mappings string.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="mappings"/> is null.</exception>
+    /// <exception cref="ObjectDisposedException">Thrown if the joystick instance has been disposed.</exception>
+    /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
     public void UpdateGamepadMappings(string mappings)
     {
         ThrowIfDisposed();

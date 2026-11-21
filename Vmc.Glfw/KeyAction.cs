@@ -5,9 +5,23 @@
 
 namespace Vmc.Glfw;
 
+/// <summary>
+/// Represents the action performed on a key.
+/// </summary>
 public enum KeyAction
 {
+    /// <summary>
+    /// The key was released.
+    /// </summary>
     Release,
+
+    /// <summary>
+    /// The key was pressed.
+    /// </summary>
     Press,
+
+    /// <summary>
+    /// The key is being held down and repeating.
+    /// </summary>
     Repeat,
 }
