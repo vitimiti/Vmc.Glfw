@@ -72,7 +72,5 @@ internal static partial class Glfw
     public const int Platform = 0x0005_0003;
     public const int CocoaChDirResources = 0x0005_1001;
     public const int CocoaMenubar = 0x0005_1002;
-    public const int X11XcbVulkanSurface = 0x0005_2001;
     public const int WaylandLibDecor = 0x0005_3001;
-    public const int DontCare = -1;
 }

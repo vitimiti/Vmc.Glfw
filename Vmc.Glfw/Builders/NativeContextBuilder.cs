@@ -19,6 +19,20 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    public NativeContextBuilder WithAnglePlatformType(AnglePlatformType type)
+    {
+        Unsafe.Glfw.InitHint(Unsafe.Glfw.AnglePlatformType, (int)type);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public NativeContextBuilder WithPlatform(Platform platform)
+    {
+        Unsafe.Glfw.InitHint(Unsafe.Glfw.Platform, (int)platform);
+        Utilities.CheckError();
+        return this;
+    }
+
     public NativeContextBuilder WithCocoaChDirResources(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaChDirResources, b ? 1 : 0);

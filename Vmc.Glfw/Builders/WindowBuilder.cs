@@ -108,6 +108,15 @@ public sealed class WindowBuilder
         return this;
     }
 
+    public WindowBuilder WithAnyPosition()
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.PositionX, Unsafe.Glfw.AnyPosition);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.PositionY, Unsafe.Glfw.AnyPosition);
+        Utilities.CheckError();
+        return this;
+    }
+
     public WindowBuilder ScalesToMonitor(bool b)
     {
         Unsafe.Glfw.WindowHint(Unsafe.Glfw.ScaleToMonitor, b ? 1 : 0);
@@ -118,6 +127,13 @@ public sealed class WindowBuilder
     public WindowBuilder ScalesFramebuffer(bool b)
     {
         Unsafe.Glfw.WindowHint(Unsafe.Glfw.ScaleFramebuffer, b ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithCocoaRetinaFramebuffer(bool b)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.CocoaRetinaFramebuffer, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
