@@ -93,6 +93,17 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    public unsafe Window? CurrentContext
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var window = Unsafe.Glfw.GetCurrentContext();
+            Utilities.CheckError();
+            return window is null ? null : new Window(window, isOwned: false);
+        }
+    }
+
     internal NativeContext()
     {
         Unsafe.Glfw.Init();
@@ -236,5 +247,40 @@ public sealed class NativeContext : IDisposable
     {
         ThrowIfDisposed();
         return new Joystick(id);
+    }
+
+    public unsafe bool IsExtensionSupported(string extension)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(extension);
+        var extensionPtr = Marshal.StringToCoTaskMemUTF8(extension);
+        try
+        {
+            var isSupported = Unsafe.Glfw.ExtensionSupported((byte*)extensionPtr);
+            Utilities.CheckError();
+            return isSupported;
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(extensionPtr);
+        }
+    }
+
+    public unsafe TDelegate GetProcAddress<TDelegate>(string procname)
+        where TDelegate : Delegate
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(procname);
+        var procnamePtr = Marshal.StringToCoTaskMemUTF8(procname);
+        try
+        {
+            var address = Unsafe.Glfw.GetProcAddress((byte*)procnamePtr);
+            Utilities.CheckError();
+            return Marshal.GetDelegateForFunctionPointer<TDelegate>((nint)address);
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(procnamePtr);
+        }
     }
 }

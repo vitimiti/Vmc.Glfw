@@ -1221,6 +1221,27 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    public void MakeContextCurrent()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.MakeContextCurrent(Handle);
+        Utilities.CheckError();
+    }
+
+    public void SwapBuffers()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SwapBuffers(Handle);
+        Utilities.CheckError();
+    }
+
+    public void SwapInterval(int interval)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SwapInterval(interval);
+        Utilities.CheckError();
+    }
+
     private sealed class CallbacksWrapper
     {
         public WindowPositionCallback? PositionCallback { get; set; }
