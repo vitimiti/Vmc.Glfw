@@ -127,10 +127,6 @@ internal static unsafe partial class Glfw
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void SetGammaRamp(Monitor* monitor, in GammaRamp ramp);
 
-    [LibraryImport(DllName, EntryPoint = "glfwDefaultWindowHints")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void DefaultWindowHints();
-
     [LibraryImport(DllName, EntryPoint = "glfwWindowHint")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void WindowHint(int hint, int value);
