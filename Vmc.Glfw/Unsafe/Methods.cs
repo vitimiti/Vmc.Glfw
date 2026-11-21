@@ -428,7 +428,7 @@ internal static unsafe partial class Glfw
 
     [LibraryImport(DllName, EntryPoint = "glfwCreateCursor")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial Cursor* CreateCursor(Image* image, int xhot, int yhot);
+    public static partial Cursor* CreateCursor(in Image image, int xhot, int yhot);
 
     [LibraryImport(DllName, EntryPoint = "glfwCreateStandardCursor")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

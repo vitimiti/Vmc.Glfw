@@ -4,7 +4,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Vmc.Glfw;
 
@@ -157,5 +159,30 @@ public sealed class NativeContext : IDisposable
         var scancode = Unsafe.Glfw.GetKeyScancode(key);
         Utilities.CheckError();
         return scancode;
+    }
+
+    public unsafe Cursor CreateCursor(Image image, Point hotspot)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(image);
+        var pixelsSpan = image.Pixels.ToArray().AsSpan();
+        var actualImage = new Unsafe.Glfw.Image
+        {
+            Width = image.Size.Width,
+            Height = image.Size.Height,
+            Pixels = (byte*)SysUnsafe.AsPointer(ref pixelsSpan),
+        };
+
+        var cursor = Unsafe.Glfw.CreateCursor(in actualImage, hotspot.X, hotspot.Y);
+        Utilities.CheckError();
+        return new Cursor(cursor);
+    }
+
+    public unsafe Cursor CreateStandardCursor(CursorShape shape)
+    {
+        ThrowIfDisposed();
+        var cursor = Unsafe.Glfw.CreateStandardCursor(shape);
+        Utilities.CheckError();
+        return new Cursor(cursor);
     }
 }

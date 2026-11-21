@@ -869,6 +869,13 @@ public sealed unsafe class Window : IDisposable
         return action;
     }
 
+    public void SetCursor(Cursor? cursor)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SetCursor(Handle, cursor is null ? null : cursor.Handle);
+        Utilities.CheckError();
+    }
+
     private sealed class CallbacksWrapper
     {
         public WindowPositionCallback? PositionCallback { get; set; }
