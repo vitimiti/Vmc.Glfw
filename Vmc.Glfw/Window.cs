@@ -29,6 +29,15 @@ public delegate void KeyCallback(
 );
 public delegate void CharCallback(Window window, uint codepoint);
 public delegate void CharModsCallback(Window window, uint codepoint, KeyModifiers mods);
+public delegate void MouseButtonCallback(
+    Window window,
+    MouseButton button,
+    ButtonAction action,
+    KeyModifiers mods
+);
+public delegate void CursorPositionCallback(Window window, PointF position);
+public delegate void CursorEnterCallback(Window window, bool entered);
+public delegate void ScrollCallback(Window window, Vector2 offset);
 
 public sealed unsafe class Window : IDisposable
 {
@@ -707,6 +716,85 @@ public sealed unsafe class Window : IDisposable
         callbacksWrapper?.CharModsCallback?.Invoke(unownedWindow, codepoint, mods);
     }
 
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void MouseButtonCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        MouseButton button,
+        ButtonAction action,
+        KeyModifiers mods
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.MouseButtonCallback?.Invoke(unownedWindow, button, action, mods);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void CursorPositionCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        double xpos,
+        double ypos
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.CursorPositionCallback?.Invoke(
+            unownedWindow,
+            new PointF((float)xpos, (float)ypos)
+        );
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void CursorEnterCallbackHandler(Unsafe.Glfw.Window* handle, int entered)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.CursorEnterCallback?.Invoke(unownedWindow, entered != 0);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void ScrollCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        double xoffset,
+        double yoffset
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.ScrollCallback?.Invoke(
+            unownedWindow,
+            new Vector2((float)xoffset, (float)yoffset)
+        );
+    }
+
     public void Dispose()
     {
         if (_disposed || !_isOwned)
@@ -964,6 +1052,38 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    public void SetMouseButtonCallback(MouseButtonCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.MouseButtonCallback = callback;
+        Unsafe.Glfw.SetMouseButtonCallback(Handle, &MouseButtonCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetCursorPositionCallback(CursorPositionCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.CursorPositionCallback = callback;
+        Unsafe.Glfw.SetCursorPosCallback(Handle, &CursorPositionCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetCursorEnterCallback(CursorEnterCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.CursorEnterCallback = callback;
+        Unsafe.Glfw.SetCursorEnterCallback(Handle, &CursorEnterCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetScrollCallback(ScrollCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.ScrollCallback = callback;
+        Unsafe.Glfw.SetScrollCallback(Handle, &ScrollCallbackHandler);
+        Utilities.CheckError();
+    }
+
     private sealed class CallbacksWrapper
     {
         public WindowPositionCallback? PositionCallback { get; set; }
@@ -978,5 +1098,9 @@ public sealed unsafe class Window : IDisposable
         public KeyCallback? KeyCallback { get; set; }
         public CharCallback? CharCallback { get; set; }
         public CharModsCallback? CharModsCallback { get; set; }
+        public MouseButtonCallback? MouseButtonCallback { get; set; }
+        public CursorPositionCallback? CursorPositionCallback { get; set; }
+        public CursorEnterCallback? CursorEnterCallback { get; set; }
+        public ScrollCallback? ScrollCallback { get; set; }
     }
 }
