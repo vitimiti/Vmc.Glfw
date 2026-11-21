@@ -3,6 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw;
@@ -65,5 +66,41 @@ public sealed class GlfwContext : IDisposable
         var supported = Unsafe.Glfw.PlatformSupported(platform);
         Utilities.CheckError();
         return supported;
+    }
+
+    public unsafe ReadOnlyCollection<Monitor>? GetMonitors()
+    {
+        ThrowIfDisposed();
+        var monitors = Unsafe.Glfw.GetMonitors(out var count);
+        Utilities.CheckError();
+        if (monitors is null)
+        {
+            return null;
+        }
+        if (count == 0)
+        {
+            return [];
+        }
+
+        var monitorList = new Monitor[count];
+        for (var i = 0; i < count; i++)
+        {
+            if (monitors[i] is null)
+            {
+                continue;
+            }
+
+            monitorList[i] = new Monitor(monitors[i]);
+        }
+
+        return new ReadOnlyCollection<Monitor>(monitorList);
+    }
+
+    public unsafe Monitor? GetPrimaryMonitor()
+    {
+        ThrowIfDisposed();
+        var monitor = Unsafe.Glfw.GetPrimaryMonitor();
+        Utilities.CheckError();
+        return monitor is null ? null : new Monitor(monitor);
     }
 }
