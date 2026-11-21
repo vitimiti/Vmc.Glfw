@@ -249,6 +249,13 @@ public sealed class NativeContext : IDisposable
         return new Joystick(id);
     }
 
+    public void SetSwapInterval(int interval)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SwapInterval(interval);
+        Utilities.CheckError();
+    }
+
     public unsafe bool IsExtensionSupported(string extension)
     {
         ThrowIfDisposed();
