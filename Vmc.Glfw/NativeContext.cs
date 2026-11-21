@@ -192,4 +192,10 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
         return new Cursor(cursor);
     }
+
+    public Joystick GetJoystick(JoystickID id)
+    {
+        ThrowIfDisposed();
+        return new Joystick(id);
+    }
 }
