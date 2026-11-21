@@ -182,11 +182,11 @@ public sealed unsafe class Joystick : IDisposable
         }
     }
 
-    public void SetCallback(JoystickCallback callback)
+    public void SetCallback(JoystickCallback? callback)
     {
         ThrowIfDisposed();
         Callbacks.Callback = callback;
-        Unsafe.Glfw.SetJoystickCallback(&JoystickCallbackHandler);
+        Unsafe.Glfw.SetJoystickCallback(callback is null ? null : &JoystickCallbackHandler);
         Utilities.CheckError();
     }
 

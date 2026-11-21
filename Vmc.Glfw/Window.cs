@@ -1012,7 +1012,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.PositionCallback = callback;
-        Unsafe.Glfw.SetWindowPosCallback(Handle, &WindowPositionCallbackHandler);
+        Unsafe.Glfw.SetWindowPosCallback(
+            Handle,
+            callback is null ? null : &WindowPositionCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1020,7 +1023,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.SizeCallback = callback;
-        Unsafe.Glfw.SetWindowSizeCallback(Handle, &WindowSizeCallbackHandler);
+        Unsafe.Glfw.SetWindowSizeCallback(
+            Handle,
+            callback is null ? null : &WindowSizeCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1028,7 +1034,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.CloseCallback = callback;
-        Unsafe.Glfw.SetWindowCloseCallback(Handle, &WindowCloseCallbackHandler);
+        Unsafe.Glfw.SetWindowCloseCallback(
+            Handle,
+            callback is null ? null : &WindowCloseCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1036,7 +1045,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.RefreshCallback = callback;
-        Unsafe.Glfw.SetWindowRefreshCallback(Handle, &WindowRefreshCallbackHandler);
+        Unsafe.Glfw.SetWindowRefreshCallback(
+            Handle,
+            callback is null ? null : &WindowRefreshCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1044,7 +1056,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.FocusCallback = callback;
-        Unsafe.Glfw.SetWindowFocusCallback(Handle, &WindowFocusCallbackHandler);
+        Unsafe.Glfw.SetWindowFocusCallback(
+            Handle,
+            callback is null ? null : &WindowFocusCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1052,7 +1067,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.IconifyCallback = callback;
-        Unsafe.Glfw.SetWindowIconifyCallback(Handle, &WindowIconifyCallbackHandler);
+        Unsafe.Glfw.SetWindowIconifyCallback(
+            Handle,
+            callback is null ? null : &WindowIconifyCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1060,7 +1078,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.MaximizeCallback = callback;
-        Unsafe.Glfw.SetWindowMaximizeCallback(Handle, &WindowMaximizeCallbackHandler);
+        Unsafe.Glfw.SetWindowMaximizeCallback(
+            Handle,
+            callback is null ? null : &WindowMaximizeCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1068,7 +1089,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.FramebufferSizeCallback = callback;
-        Unsafe.Glfw.SetFramebufferSizeCallback(Handle, &FramebufferSizeCallbackHandler);
+        Unsafe.Glfw.SetFramebufferSizeCallback(
+            Handle,
+            callback is null ? null : &FramebufferSizeCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1076,7 +1100,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.ContentScaleCallback = callback;
-        Unsafe.Glfw.SetWindowContentScaleCallback(Handle, &WindowContentScaleCallbackHandler);
+        Unsafe.Glfw.SetWindowContentScaleCallback(
+            Handle,
+            callback is null ? null : &WindowContentScaleCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1107,7 +1134,7 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.KeyCallback = callback;
-        Unsafe.Glfw.SetKeyCallback(Handle, &KeyCallbackHandler);
+        Unsafe.Glfw.SetKeyCallback(Handle, callback is null ? null : &KeyCallbackHandler);
         Utilities.CheckError();
     }
 
@@ -1115,7 +1142,7 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.CharCallback = callback;
-        Unsafe.Glfw.SetCharCallback(Handle, &CharCallbackHandler);
+        Unsafe.Glfw.SetCharCallback(Handle, callback is null ? null : &CharCallbackHandler);
         Utilities.CheckError();
     }
 
@@ -1123,7 +1150,7 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.CharModsCallback = callback;
-        Unsafe.Glfw.SetCharModsCallback(Handle, &CharModsCallbackHandler);
+        Unsafe.Glfw.SetCharModsCallback(Handle, callback is null ? null : &CharModsCallbackHandler);
         Utilities.CheckError();
     }
 
@@ -1131,7 +1158,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.MouseButtonCallback = callback;
-        Unsafe.Glfw.SetMouseButtonCallback(Handle, &MouseButtonCallbackHandler);
+        Unsafe.Glfw.SetMouseButtonCallback(
+            Handle,
+            callback is null ? null : &MouseButtonCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1139,7 +1169,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.CursorPositionCallback = callback;
-        Unsafe.Glfw.SetCursorPosCallback(Handle, &CursorPositionCallbackHandler);
+        Unsafe.Glfw.SetCursorPosCallback(
+            Handle,
+            callback is null ? null : &CursorPositionCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1147,7 +1180,10 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.CursorEnterCallback = callback;
-        Unsafe.Glfw.SetCursorEnterCallback(Handle, &CursorEnterCallbackHandler);
+        Unsafe.Glfw.SetCursorEnterCallback(
+            Handle,
+            callback is null ? null : &CursorEnterCallbackHandler
+        );
         Utilities.CheckError();
     }
 
@@ -1155,7 +1191,7 @@ public sealed unsafe class Window : IDisposable
     {
         ThrowIfDisposed();
         Callbacks.ScrollCallback = callback;
-        Unsafe.Glfw.SetScrollCallback(Handle, &ScrollCallbackHandler);
+        Unsafe.Glfw.SetScrollCallback(Handle, callback is null ? null : &ScrollCallbackHandler);
         Utilities.CheckError();
     }
 

@@ -181,10 +181,10 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
-    public static void SetCallback(MonitorCallback callback)
+    public static void SetCallback(MonitorCallback? callback)
     {
         Callbacks.Callback = callback;
-        Unsafe.Glfw.SetMonitorCallback(&MonitorCallbackHandler);
+        Unsafe.Glfw.SetMonitorCallback(callback is null ? null : &MonitorCallbackHandler);
         Utilities.CheckError();
     }
 
