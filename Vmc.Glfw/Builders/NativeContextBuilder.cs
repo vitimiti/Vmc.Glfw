@@ -8,10 +8,18 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw.Builders;
 
+/// <summary>
+/// Builder class for creating and configuring a NativeContext.
+/// </summary>
 public sealed class NativeContextBuilder
 {
     private NativeContext? _context;
 
+    /// <summary>
+    /// Sets whether joystick hats should be exposed as buttons.
+    /// </summary>
+    /// <param name="b"><see langword="true"/> to expose joystick hats as buttons, <see langword="false"/> otherwise.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithJoystickHatsExposedAsButtons(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.JoystickHatButtons, b ? 1 : 0);
@@ -19,6 +27,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the ANGLE platform type.
+    /// </summary>
+    /// <param name="type">The ANGLE platform type to set.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithAnglePlatformType(AnglePlatformType type)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.AnglePlatformType, (int)type);
@@ -26,6 +39,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the platform for the native context.
+    /// </summary>
+    /// <param name="platform">The platform to set.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithPlatform(Platform platform)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.Platform, (int)platform);
@@ -33,6 +51,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets whether the Cocoa chdir resources option is enabled.
+    /// </summary>
+    /// <param name="b"><see langword="true"/> to enable, <see langword="false"/> to disable.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithCocoaChDirResources(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaChDirResources, b ? 1 : 0);
@@ -40,6 +63,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets whether the Cocoa menubar option is enabled.
+    /// </summary>
+    /// <param name="b"><see langword="true"/> to enable, <see langword="false"/> to disable.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithCocoaMenubar(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaMenubar, b ? 1 : 0);
@@ -47,6 +75,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets whether the Wayland libdecor option is enabled.
+    /// </summary>
+    /// <param name="b"><see langword="true"/> to enable, <see langword="false"/> to disable.</param>
+    /// <returns>The current builder instance.</returns>
     public NativeContextBuilder WithWaylandLibDecor(bool b)
     {
         Unsafe.Glfw.InitHint(
@@ -57,6 +90,11 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets whether to use .NET allocators for memory management.
+    /// </summary>
+    /// <param name="b"><see langword="true"/> to use .NET allocators, <see langword="false"/> otherwise.</param>
+    /// <returns>The current builder instance.</returns>
     public unsafe NativeContextBuilder WithDotnetAllocators(bool b)
     {
         if (b)
@@ -74,6 +112,10 @@ public sealed class NativeContextBuilder
         return this;
     }
 
+    /// <summary>
+    /// Builds and returns the configured NativeContext instance.
+    /// </summary>
+    /// <returns>The configured NativeContext instance.</returns>
     public NativeContext Build() => _context ??= new NativeContext();
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
