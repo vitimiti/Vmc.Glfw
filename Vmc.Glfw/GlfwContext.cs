@@ -43,6 +43,8 @@ public sealed class GlfwContext : IDisposable
         Utilities.CheckError();
     }
 
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+
     public void Dispose()
     {
         if (_disposed)
@@ -60,6 +62,4 @@ public sealed class GlfwContext : IDisposable
         ThrowIfDisposed();
         return Unsafe.Glfw.PlatformSupported(platform);
     }
-
-    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
 }
