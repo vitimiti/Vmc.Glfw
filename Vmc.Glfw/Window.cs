@@ -1,0 +1,761 @@
+// Copyright Victor Matia 2026
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+using System.Drawing;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
+
+namespace Vmc.Glfw;
+
+public delegate void WindowPositionCallback(Window window, Point position);
+public delegate void WindowSizeCallback(Window window, Size size);
+public delegate void WindowCloseCallback(Window window);
+public delegate void WindowRefreshCallback(Window window);
+public delegate void WindowFocusCallback(Window window, bool focused);
+public delegate void WindowIconifyCallback(Window window, bool iconified);
+public delegate void WindowMaximizeCallback(Window window, bool maximized);
+public delegate void FramebufferSizeCallback(Window window, Size size);
+public delegate void WindowContentScaleCallback(Window window, Vector2 scale);
+
+public sealed unsafe class Window : IDisposable
+{
+    private static readonly CallbacksWrapper Callbacks = new();
+
+    private readonly bool _isOwned;
+
+    private GCHandle _gcHandle;
+    private bool _disposed;
+
+    internal Unsafe.Glfw.Window* Handle { get; }
+
+    public bool ShouldClose
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var result = Unsafe.Glfw.WindowShouldClose(Handle);
+            Utilities.CheckError();
+            return result;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowShouldClose(Handle, value);
+            Utilities.CheckError();
+        }
+    }
+
+    public string Title
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var titlePtr = Unsafe.Glfw.GetWindowTitle(Handle);
+            Utilities.CheckError();
+            return Marshal.PtrToStringUTF8((nint)titlePtr) ?? string.Empty;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            ArgumentNullException.ThrowIfNull(value);
+            var titlePtr = (byte*)Marshal.StringToCoTaskMemUTF8(value);
+            try
+            {
+                Unsafe.Glfw.SetWindowTitle(Handle, titlePtr);
+                Utilities.CheckError();
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem((nint)titlePtr);
+            }
+        }
+    }
+
+    public Point Position
+    {
+        get
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.GetWindowPos(Handle, out var xpos, out var ypos);
+            Utilities.CheckError();
+            return new Point(xpos, ypos);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowPos(Handle, value.X, value.Y);
+            Utilities.CheckError();
+        }
+    }
+
+    public Size Size
+    {
+        get
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.GetWindowSize(Handle, out var width, out var height);
+            Utilities.CheckError();
+            return new Size(width, height);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowSize(Handle, value.Width, value.Height);
+            Utilities.CheckError();
+        }
+    }
+
+    public Size FramebufferSize
+    {
+        get
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.GetFramebufferSize(Handle, out var width, out var height);
+            Utilities.CheckError();
+            return new Size(width, height);
+        }
+    }
+
+    public (int Left, int Top, int Right, int Bottom) FrameSize
+    {
+        get
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.GetWindowFrameSize(
+                Handle,
+                out var left,
+                out var top,
+                out var right,
+                out var bottom
+            );
+            Utilities.CheckError();
+            return (left, top, right, bottom);
+        }
+    }
+
+    public Vector2 ContentScale
+    {
+        get
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.GetWindowContentScale(Handle, out var xscale, out var yscale);
+            Utilities.CheckError();
+            return new Vector2(xscale, yscale);
+        }
+    }
+
+    public float Opacity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var opacity = Unsafe.Glfw.GetWindowOpacity(Handle);
+            Utilities.CheckError();
+            return opacity;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            ArgumentOutOfRangeException.ThrowIfNegative(value);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 1F);
+            Unsafe.Glfw.SetWindowOpacity(Handle, value);
+            Utilities.CheckError();
+        }
+    }
+
+    public Monitor? Monitor
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var monitorHandle = Unsafe.Glfw.GetWindowMonitor(Handle);
+            Utilities.CheckError();
+            return monitorHandle is not null ? new Monitor(monitorHandle, isOwned: false) : null;
+        }
+    }
+
+    public bool Focused
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var focused = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Focused);
+            Utilities.CheckError();
+            return focused != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Focused, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Iconified
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var iconified = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Iconified);
+            Utilities.CheckError();
+            return iconified != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Iconified, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Resizable
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var resizable = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Resizable);
+            Utilities.CheckError();
+            return resizable != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Resizable, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Visible
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var visible = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Visible);
+            Utilities.CheckError();
+            return visible != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Visible, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Decorated
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var decorated = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Decorated);
+            Utilities.CheckError();
+            return decorated != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Decorated, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool AutoIconify
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var autoIconify = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.AutoIconify);
+            Utilities.CheckError();
+            return autoIconify != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.AutoIconify, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Floating
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var floating = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Floating);
+            Utilities.CheckError();
+            return floating != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Floating, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Maximized
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var maximized = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Maximized);
+            Utilities.CheckError();
+            return maximized != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.Maximized, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool TransparentFramebuffer
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var transparentFramebuffer = Unsafe.Glfw.GetWindowAttrib(
+                Handle,
+                Unsafe.Glfw.TransparentFramebuffer
+            );
+            Utilities.CheckError();
+            return transparentFramebuffer != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.TransparentFramebuffer, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool Hovered
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hovered = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.Hovered);
+            Utilities.CheckError();
+            return hovered != 0;
+        }
+    }
+
+    public bool FocusOnShow
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var focusOnShow = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.FocusOnShow);
+            Utilities.CheckError();
+            return focusOnShow != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.FocusOnShow, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool HasMousePassthrough
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hasMousePassthrough = Unsafe.Glfw.GetWindowAttrib(
+                Handle,
+                Unsafe.Glfw.MousePassthrough
+            );
+            Utilities.CheckError();
+            return hasMousePassthrough != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.MousePassthrough, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    internal Window(Unsafe.Glfw.Window* handle, bool isOwned = true)
+    {
+        Handle = handle;
+        _isOwned = isOwned;
+        _gcHandle = GCHandle.Alloc(Callbacks);
+        Unsafe.Glfw.SetWindowUserPointer(Handle, (void*)GCHandle.ToIntPtr(_gcHandle));
+        Utilities.CheckError();
+    }
+
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowPositionCallbackHandler(Unsafe.Glfw.Window* handle, int x, int y)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.PositionCallback?.Invoke(unownedWindow, new Point(x, y));
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowSizeCallbackHandler(Unsafe.Glfw.Window* handle, int width, int height)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.SizeCallback?.Invoke(unownedWindow, new Size(width, height));
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowCloseCallbackHandler(Unsafe.Glfw.Window* handle)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.CloseCallback?.Invoke(unownedWindow);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowRefreshCallbackHandler(Unsafe.Glfw.Window* handle)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.RefreshCallback?.Invoke(unownedWindow);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowFocusCallbackHandler(Unsafe.Glfw.Window* handle, int focused)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.FocusCallback?.Invoke(unownedWindow, focused != 0);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowIconifyCallbackHandler(Unsafe.Glfw.Window* handle, int iconified)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.IconifyCallback?.Invoke(unownedWindow, iconified != 0);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowMaximizeCallbackHandler(Unsafe.Glfw.Window* handle, int maximized)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.MaximizeCallback?.Invoke(unownedWindow, maximized != 0);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void FramebufferSizeCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        int width,
+        int height
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.FramebufferSizeCallback?.Invoke(unownedWindow, new Size(width, height));
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void WindowContentScaleCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        float xscale,
+        float yscale
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        callbacksWrapper?.ContentScaleCallback?.Invoke(unownedWindow, new Vector2(xscale, yscale));
+    }
+
+    public void Dispose()
+    {
+        if (_disposed || !_isOwned)
+        {
+            return;
+        }
+
+        _disposed = true;
+
+        try
+        {
+            Unsafe.Glfw.SetWindowUserPointer(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.DestroyWindow(Handle);
+            Utilities.CheckError();
+        }
+        finally
+        {
+            if (_gcHandle.IsAllocated)
+            {
+                _gcHandle.Free();
+            }
+        }
+    }
+
+    public void SetIcon(IReadOnlyCollection<Image> images)
+    {
+        ThrowIfDisposed();
+        ArgumentNullException.ThrowIfNull(images);
+        var imageCount = images.Count;
+        var imageArray = new Unsafe.Glfw.Image[imageCount];
+        for (var i = 0; i < imageCount; i++)
+        {
+            var image = images.ElementAt(i);
+            var pixelsSpan = image.Pixels.ToArray().AsSpan();
+            imageArray[i] = new Unsafe.Glfw.Image
+            {
+                Width = image.Size.Width,
+                Height = image.Size.Height,
+                Pixels = (byte*)SysUnsafe.AsPointer(ref pixelsSpan),
+            };
+        }
+
+        var imagesSpan = imageArray.AsSpan();
+        Unsafe.Glfw.SetWindowIcon(
+            Handle,
+            imageCount,
+            (Unsafe.Glfw.Image*)SysUnsafe.AsPointer(ref imagesSpan)
+        );
+        Utilities.CheckError();
+    }
+
+    public void SetSizeLimits(Size minSize, Size maxSize)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SetWindowSizeLimits(
+            Handle,
+            minSize.Width,
+            minSize.Height,
+            maxSize.Width,
+            maxSize.Height
+        );
+        Utilities.CheckError();
+    }
+
+    public void SetAspectRatio(int numer, int denom)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SetWindowAspectRatio(Handle, numer, denom);
+        Utilities.CheckError();
+    }
+
+    public void Iconify()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.IconifyWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void Restore()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.RestoreWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void Maximize()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.MaximizeWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void Show()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.ShowWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void Hide()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.HideWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void Focus()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.FocusWindow(Handle);
+        Utilities.CheckError();
+    }
+
+    public void RequestAttention()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.RequestWindowAttention(Handle);
+        Utilities.CheckError();
+    }
+
+    public void SetMonitor(Monitor? monitor, Point position, Size size, int refreshRate)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.SetWindowMonitor(
+            Handle,
+            monitor is null ? null : monitor.Handle,
+            position.X,
+            position.Y,
+            size.Width,
+            size.Height,
+            refreshRate
+        );
+
+        Utilities.CheckError();
+    }
+
+    public void SetPositionCallback(WindowPositionCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.PositionCallback = callback;
+        Unsafe.Glfw.SetWindowPosCallback(Handle, &WindowPositionCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetSizeCallback(WindowSizeCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.SizeCallback = callback;
+        Unsafe.Glfw.SetWindowSizeCallback(Handle, &WindowSizeCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetCloseCallback(WindowCloseCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.CloseCallback = callback;
+        Unsafe.Glfw.SetWindowCloseCallback(Handle, &WindowCloseCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetRefreshCallback(WindowRefreshCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.RefreshCallback = callback;
+        Unsafe.Glfw.SetWindowRefreshCallback(Handle, &WindowRefreshCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetFocusCallback(WindowFocusCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.FocusCallback = callback;
+        Unsafe.Glfw.SetWindowFocusCallback(Handle, &WindowFocusCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetIconifyCallback(WindowIconifyCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.IconifyCallback = callback;
+        Unsafe.Glfw.SetWindowIconifyCallback(Handle, &WindowIconifyCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetMaximizeCallback(WindowMaximizeCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.MaximizeCallback = callback;
+        Unsafe.Glfw.SetWindowMaximizeCallback(Handle, &WindowMaximizeCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetFramebufferSizeCallback(FramebufferSizeCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.FramebufferSizeCallback = callback;
+        Unsafe.Glfw.SetFramebufferSizeCallback(Handle, &FramebufferSizeCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetContentScaleCallback(WindowContentScaleCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.ContentScaleCallback = callback;
+        Unsafe.Glfw.SetWindowContentScaleCallback(Handle, &WindowContentScaleCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    private sealed class CallbacksWrapper
+    {
+        public WindowPositionCallback? PositionCallback { get; set; }
+        public WindowSizeCallback? SizeCallback { get; set; }
+        public WindowCloseCallback? CloseCallback { get; set; }
+        public WindowRefreshCallback? RefreshCallback { get; set; }
+        public WindowFocusCallback? FocusCallback { get; set; }
+        public WindowIconifyCallback? IconifyCallback { get; set; }
+        public WindowMaximizeCallback? MaximizeCallback { get; set; }
+        public FramebufferSizeCallback? FramebufferSizeCallback { get; set; }
+        public WindowContentScaleCallback? ContentScaleCallback { get; set; }
+    }
+}
