@@ -6,6 +6,7 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Vmc.Glfw.Builders;
 using SysUnsafe = System.Runtime.CompilerServices.Unsafe;
 
 namespace Vmc.Glfw;
@@ -115,6 +116,12 @@ public sealed class NativeContext : IDisposable
         var monitor = Unsafe.Glfw.GetPrimaryMonitor();
         Utilities.CheckError();
         return monitor is null ? null : new Monitor(monitor);
+    }
+
+    public WindowBuilder CreateWindowBuilder()
+    {
+        ThrowIfDisposed();
+        return new WindowBuilder();
     }
 
     public void PollEvents()

@@ -13,6 +13,8 @@ public sealed class WindowBuilder
     private Window? _window;
     private unsafe Unsafe.Glfw.Window* _handle;
 
+    internal WindowBuilder() { }
+
     public WindowBuilder Focused(bool b)
     {
         Unsafe.Glfw.WindowHint(Unsafe.Glfw.Focused, b ? 1 : 0);
