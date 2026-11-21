@@ -54,6 +54,45 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    public TimeSpan Time
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var time = Unsafe.Glfw.GetTime();
+            Utilities.CheckError();
+            return TimeSpan.FromSeconds(time);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetTime(value.TotalSeconds);
+            Utilities.CheckError();
+        }
+    }
+
+    public ulong TimerValue
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var timerValue = Unsafe.Glfw.GetTimerValue();
+            Utilities.CheckError();
+            return timerValue;
+        }
+    }
+
+    public ulong TimerFrequency
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var timerFrequency = Unsafe.Glfw.GetTimerFrequency();
+            Utilities.CheckError();
+            return timerFrequency;
+        }
+    }
+
     internal NativeContext()
     {
         Unsafe.Glfw.Init();
