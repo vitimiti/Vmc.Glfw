@@ -508,6 +508,32 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    public string ClipboardString
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var text = Unsafe.Glfw.GetClipboardString(Handle);
+            Utilities.CheckError();
+            return Marshal.PtrToStringUTF8((nint)text) ?? string.Empty;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            ArgumentNullException.ThrowIfNull(value);
+            var textPtr = Marshal.StringToCoTaskMemUTF8(value);
+            try
+            {
+                Unsafe.Glfw.SetClipboardString(Handle, (byte*)textPtr);
+                Utilities.CheckError();
+            }
+            finally
+            {
+                Marshal.FreeCoTaskMem(textPtr);
+            }
+        }
+    }
+
     internal Window(Unsafe.Glfw.Window* handle, bool isOwned = true)
     {
         Handle = handle;
