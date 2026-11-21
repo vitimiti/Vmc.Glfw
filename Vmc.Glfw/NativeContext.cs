@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw;
 
-public sealed class GlfwContext : IDisposable
+public sealed class NativeContext : IDisposable
 {
     private bool _disposed;
 
@@ -40,7 +40,7 @@ public sealed class GlfwContext : IDisposable
         }
     }
 
-    internal GlfwContext()
+    internal NativeContext()
     {
         Unsafe.Glfw.Init();
         Utilities.CheckError();

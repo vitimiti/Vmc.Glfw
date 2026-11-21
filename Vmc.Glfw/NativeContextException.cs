@@ -7,5 +7,5 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw;
 
-public class GlfwException(ErrorCode errorCode, string? message)
+public class NativeContextException(ErrorCode errorCode, string? message)
     : ExternalException(message, (int)errorCode);

@@ -14,7 +14,7 @@ internal static class Utilities
         var code = Unsafe.Glfw.GetError(out var description);
         if (code is not ErrorCode.None)
         {
-            throw new GlfwException(code, Marshal.PtrToStringUTF8((nint)description));
+            throw new NativeContextException(code, Marshal.PtrToStringUTF8((nint)description));
         }
     }
 }

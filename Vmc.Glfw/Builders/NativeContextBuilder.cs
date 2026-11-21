@@ -8,32 +8,32 @@ using System.Runtime.InteropServices;
 
 namespace Vmc.Glfw.Builders;
 
-public sealed class GlfwContextBuilder
+public sealed class NativeContextBuilder
 {
-    private GlfwContext? _context;
+    private NativeContext? _context;
 
-    public GlfwContextBuilder WithJoystickHatsExposedAsButtons(bool b)
+    public NativeContextBuilder WithJoystickHatsExposedAsButtons(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.JoystickHatButtons, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
 
-    public GlfwContextBuilder WithCocoaChDirResources(bool b)
+    public NativeContextBuilder WithCocoaChDirResources(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaChDirResources, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
 
-    public GlfwContextBuilder WithCocoaMenubar(bool b)
+    public NativeContextBuilder WithCocoaMenubar(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaMenubar, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
 
-    public GlfwContextBuilder WithWaylandLibDecor(bool b)
+    public NativeContextBuilder WithWaylandLibDecor(bool b)
     {
         Unsafe.Glfw.InitHint(
             Unsafe.Glfw.WaylandLibDecor,
@@ -43,7 +43,7 @@ public sealed class GlfwContextBuilder
         return this;
     }
 
-    public unsafe GlfwContextBuilder WithDotnetAllocators(bool b)
+    public unsafe NativeContextBuilder WithDotnetAllocators(bool b)
     {
         if (b)
         {
@@ -60,7 +60,7 @@ public sealed class GlfwContextBuilder
         return this;
     }
 
-    public GlfwContext Build() => _context ??= new GlfwContext();
+    public NativeContext Build() => _context ??= new NativeContext();
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static unsafe void* AllocateFn(nuint size, void* _) => NativeMemory.Alloc(size);
