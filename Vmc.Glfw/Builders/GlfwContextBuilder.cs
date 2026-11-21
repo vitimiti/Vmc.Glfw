@@ -15,21 +15,21 @@ public sealed class GlfwContextBuilder
     public GlfwContextBuilder WithJoystickHatsExposedAsButtons(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.JoystickHatButtons, b ? 1 : 0);
-        CheckError();
+        Utilities.CheckError();
         return this;
     }
 
     public GlfwContextBuilder WithCocoaChDirResources(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaChDirResources, b ? 1 : 0);
-        CheckError();
+        Utilities.CheckError();
         return this;
     }
 
     public GlfwContextBuilder WithCocoaMenubar(bool b)
     {
         Unsafe.Glfw.InitHint(Unsafe.Glfw.CocoaMenubar, b ? 1 : 0);
-        CheckError();
+        Utilities.CheckError();
         return this;
     }
 
@@ -39,7 +39,7 @@ public sealed class GlfwContextBuilder
             Unsafe.Glfw.WaylandLibDecor,
             b ? Unsafe.Glfw.WaylandPreferLibDecor : Unsafe.Glfw.WaylandDisableLibDecor
         );
-        CheckError();
+        Utilities.CheckError();
         return this;
     }
 
@@ -55,21 +55,12 @@ public sealed class GlfwContextBuilder
                 User = null,
             };
             Unsafe.Glfw.InitAllocator(in allocator);
-            CheckError();
+            Utilities.CheckError();
         }
         return this;
     }
 
     public GlfwContext Build() => _context ??= new GlfwContext();
-
-    private static unsafe void CheckError()
-    {
-        var code = Unsafe.Glfw.GetError(out var description);
-        if (code is not ErrorCode.None)
-        {
-            throw new GlfwException(code, Marshal.PtrToStringUTF8((nint)description));
-        }
-    }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static unsafe void* AllocateFn(nuint size, void* _) => NativeMemory.Alloc(size);
