@@ -636,8 +636,4 @@ internal static unsafe partial class Glfw
     [LibraryImport(DllName, EntryPoint = "glfwGetProcAddress")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void* GetProcAddress(byte* procname);
-
-    [LibraryImport(DllName, EntryPoint = "glfwGetRequiredInstanceExtensions")]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial byte** GetRequiredInstanceExtensions(out uint count);
 }
