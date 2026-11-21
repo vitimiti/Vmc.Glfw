@@ -37,7 +37,7 @@ internal static partial class Glfw
     public const int Samples = 0x0002_100D;
     public const int SrgbCapable = 0x0002_100E;
     public const int RefreshRate = 0x0002_100F;
-    public const int Doublebuffer = 0x0002_1010;
+    public const int DoubleBuffer = 0x0002_1010;
     public const int ClientApi = 0x0002_2001;
     public const int ContextVersionMajor = 0x0002_2002;
     public const int ContextVersionMinor = 0x0002_2003;

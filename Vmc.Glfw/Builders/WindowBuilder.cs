@@ -207,6 +207,146 @@ public sealed class WindowBuilder
         }
     }
 
+    public WindowBuilder WithFramebufferBits(Color c)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.RedBits, c.R);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.GreenBits, c.G);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.BlueBits, c.B);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AlphaBits, c.A);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithDepthBits(int bits)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.DepthBits, bits);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithStencilBits(int bits)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.StencilBits, bits);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithAccumulationBits(Color c)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AccumRedBits, c.R);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AccumGreenBits, c.G);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AccumBlueBits, c.B);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AccumAlphaBits, c.A);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithAuxiliaryBuffers(int count)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.AuxBuffers, count);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithStereo(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.Stereo, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithSamples(int count)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.Samples, count);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder IsSrgbCapable(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.SrgbCapable, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithDoubleBuffer(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.DoubleBuffer, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithClientApi(ClientApi api)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ClientApi, (int)api);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextVersion(Version version)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextVersionMajor, version.Major);
+        Utilities.CheckError();
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextVersionMinor, version.Minor);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextRobustness(ContextRobustness robustness)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextRobustness, (int)robustness);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder IsOpenGLForwardCompatible(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.OpenGLForwardCompat, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextDebug(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextDebug, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithOpenGLProfile(OpenGLProfile profile)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.OpenGLProfile, (int)profile);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextReleaseBehavior(ContextReleaseBehavior behavior)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextReleaseBehavior, (int)behavior);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextNoError(bool enabled)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextNoError, enabled ? 1 : 0);
+        Utilities.CheckError();
+        return this;
+    }
+
+    public WindowBuilder WithContextCreationApi(ContextCreationApi api)
+    {
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ContextCreationApi, (int)api);
+        Utilities.CheckError();
+        return this;
+    }
+
     public unsafe Window Build(
         Size size,
         string title,

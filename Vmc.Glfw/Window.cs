@@ -489,6 +489,123 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    public bool HasDoubleBuffer
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hasDoubleBuffer = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.DoubleBuffer);
+            Utilities.CheckError();
+            return hasDoubleBuffer != 0;
+        }
+    }
+
+    public ClientApi ClientApi
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var clientApi = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ClientApi);
+            Utilities.CheckError();
+            return (ClientApi)clientApi;
+        }
+    }
+
+    public Version ContextVersion
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var major = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextVersionMajor);
+            Utilities.CheckError();
+            var minor = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextVersionMinor);
+            Utilities.CheckError();
+            var rev = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextRevision);
+            Utilities.CheckError();
+            return new Version(major, minor, rev);
+        }
+    }
+
+    public ContextRobustness ContextRobustness
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var robustness = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextRobustness);
+            Utilities.CheckError();
+            return (ContextRobustness)robustness;
+        }
+    }
+
+    public bool IsOpenGLForwardCompatible
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var forwardCompat = Unsafe.Glfw.GetWindowAttrib(
+                Handle,
+                Unsafe.Glfw.OpenGLForwardCompat
+            );
+            Utilities.CheckError();
+            return forwardCompat != 0;
+        }
+    }
+
+    public bool IsContextDebug
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var contextDebug = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextDebug);
+            Utilities.CheckError();
+            return contextDebug != 0;
+        }
+    }
+
+    public OpenGLProfile OpenGLProfile
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var profile = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.OpenGLProfile);
+            Utilities.CheckError();
+            return (OpenGLProfile)profile;
+        }
+    }
+
+    public ContextReleaseBehavior ContextReleaseBehavior
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var behavior = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextReleaseBehavior);
+            Utilities.CheckError();
+            return (ContextReleaseBehavior)behavior;
+        }
+    }
+
+    public bool IsContextNoError
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var noError = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextNoError);
+            Utilities.CheckError();
+            return noError != 0;
+        }
+    }
+
+    public ContextCreationApi ContextCreationApi
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var api = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.ContextCreationApi);
+            Utilities.CheckError();
+            return (ContextCreationApi)api;
+        }
+    }
+
     public PointF CursorPosition
     {
         get
