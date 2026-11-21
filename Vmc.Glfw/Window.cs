@@ -470,6 +470,25 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    public PointF CursorPosition
+    {
+        get
+        {
+            ThrowIfDisposed();
+            double xpos,
+                ypos;
+            Unsafe.Glfw.GetCursorPos(Handle, &xpos, &ypos);
+            Utilities.CheckError();
+            return new PointF((float)xpos, (float)ypos);
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetCursorPos(Handle, value.X, value.Y);
+            Utilities.CheckError();
+        }
+    }
+
     internal Window(Unsafe.Glfw.Window* handle, bool isOwned = true)
     {
         Handle = handle;
@@ -832,6 +851,22 @@ public sealed unsafe class Window : IDisposable
         Callbacks.ContentScaleCallback = callback;
         Unsafe.Glfw.SetWindowContentScaleCallback(Handle, &WindowContentScaleCallbackHandler);
         Utilities.CheckError();
+    }
+
+    public KeyAction GetKey(Key key)
+    {
+        ThrowIfDisposed();
+        var action = Unsafe.Glfw.GetKey(Handle, key);
+        Utilities.CheckError();
+        return action;
+    }
+
+    public ButtonAction GetMouseButton(MouseButton button)
+    {
+        ThrowIfDisposed();
+        var action = Unsafe.Glfw.GetMouseButton(Handle, button);
+        Utilities.CheckError();
+        return action;
     }
 
     private sealed class CallbacksWrapper

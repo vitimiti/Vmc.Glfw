@@ -416,7 +416,7 @@ internal static unsafe partial class Glfw
 
     [LibraryImport(DllName, EntryPoint = "glfwGetMouseButton")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial ButtonAction GetMouseButton(Window* window, int button);
+    public static partial ButtonAction GetMouseButton(Window* window, MouseButton button);
 
     [LibraryImport(DllName, EntryPoint = "glfwGetCursorPos")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
