@@ -33,7 +33,9 @@ public sealed class GlfwContext : IDisposable
         get
         {
             ThrowIfDisposed();
-            return Unsafe.Glfw.GetPlatform();
+            var platform = Unsafe.Glfw.GetPlatform();
+            Utilities.CheckError();
+            return platform;
         }
     }
 
@@ -60,6 +62,8 @@ public sealed class GlfwContext : IDisposable
     public bool IsPlatformSupported(Platform platform)
     {
         ThrowIfDisposed();
-        return Unsafe.Glfw.PlatformSupported(platform);
+        var supported = Unsafe.Glfw.PlatformSupported(platform);
+        Utilities.CheckError();
+        return supported;
     }
 }
