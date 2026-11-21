@@ -38,6 +38,7 @@ public delegate void MouseButtonCallback(
 public delegate void CursorPositionCallback(Window window, PointF position);
 public delegate void CursorEnterCallback(Window window, bool entered);
 public delegate void ScrollCallback(Window window, Vector2 offset);
+public delegate void DropCallback(Window window, string[] paths);
 
 public sealed unsafe class Window : IDisposable
 {
@@ -795,6 +796,29 @@ public sealed unsafe class Window : IDisposable
         );
     }
 
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void DropCallbackHandler(Unsafe.Glfw.Window* handle, int pathCount, byte** paths)
+    {
+        if (handle is null || paths is null || pathCount == 0)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        if (callbacksWrapper?.DropCallback is not null)
+        {
+            var pathArray = new string[pathCount];
+            for (var i = 0; i < pathCount; i++)
+            {
+                pathArray[i] = Marshal.PtrToStringUTF8((nint)paths[i]) ?? string.Empty;
+            }
+            callbacksWrapper.DropCallback.Invoke(unownedWindow, pathArray);
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed || !_isOwned)
@@ -1102,5 +1126,6 @@ public sealed unsafe class Window : IDisposable
         public CursorPositionCallback? CursorPositionCallback { get; set; }
         public CursorEnterCallback? CursorEnterCallback { get; set; }
         public ScrollCallback? ScrollCallback { get; set; }
+        public DropCallback? DropCallback { get; set; }
     }
 }
