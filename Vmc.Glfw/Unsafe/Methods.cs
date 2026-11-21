@@ -377,6 +377,18 @@ internal static unsafe partial class Glfw
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void PollEvents();
 
+    [LibraryImport(DllName, EntryPoint = "glfwWaitEvents")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void WaitEvents();
+
+    [LibraryImport(DllName, EntryPoint = "glfwWaitEventsTimeout")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void WaitEventsTimeout(double timeout);
+
+    [LibraryImport(DllName, EntryPoint = "glfwPostEmptyEvent")]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    public static partial void PostEmptyEvent();
+
     [LibraryImport(DllName, EntryPoint = "glfwGetInputMode")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial int GetInputMode(Window* window, int mode);

@@ -103,4 +103,32 @@ public sealed class NativeContext : IDisposable
         Utilities.CheckError();
         return monitor is null ? null : new Monitor(monitor);
     }
+
+    public void PollEvents()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.PollEvents();
+        Utilities.CheckError();
+    }
+
+    public void WaitEvents()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.WaitEvents();
+        Utilities.CheckError();
+    }
+
+    public void WaitEventsTimeout(TimeSpan timeout)
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.WaitEventsTimeout(timeout.TotalSeconds);
+        Utilities.CheckError();
+    }
+
+    public void PostEmptyEvent()
+    {
+        ThrowIfDisposed();
+        Unsafe.Glfw.PostEmptyEvent();
+        Utilities.CheckError();
+    }
 }
