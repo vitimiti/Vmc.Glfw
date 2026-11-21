@@ -16,7 +16,7 @@ internal static partial class Glfw
     public const int Floating = 0x0002_0007;
     public const int Maximized = 0x0002_0008;
     public const int CenterCursor = 0x0002_0009;
-    public const int TransparentFramebuffer = 0x0002_000A;
+    public const int TransparentFrameBuffer = 0x0002_000A;
     public const int Hovered = 0x0002_000B;
     public const int FocusOnShow = 0x0002_000C;
     public const int MousePassthrough = 0x0002_000D;
@@ -50,8 +50,8 @@ internal static partial class Glfw
     public const int ContextNoError = 0x0002_200A;
     public const int ContextCreationApi = 0x0002_200B;
     public const int ScaleToMonitor = 0x0002_200C;
-    public const int ScaleFramebuffer = 0x0002_200D;
-    public const int CocoaRetinaFramebuffer = 0x0002_3001;
+    public const int ScaleFrameBuffer = 0x0002_200D;
+    public const int CocoaRetinaFrameBuffer = 0x0002_3001;
     public const int CocoaFrameName = 0x0002_3002;
     public const int CocoaGraphicsSwitching = 0x0002_3003;
     public const int X11ClassName = 0x0002_4001;

@@ -60,7 +60,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        glfwGetFrameBufferSize(window, &width, &height);
         float const ratio = width / (float)height;
 
         // Do our OpenGL drawing here
@@ -101,8 +101,8 @@ nativeContext.SetSwapInterval(1);
 
 while (!window.ShouldClose)
 {
-    var framebufferSize = window.FramebufferSize;
-    var ratio = framebufferSize.Width / (float)framebufferSize.Height;
+    var frameBufferSize = window.FrameBufferSize;
+    var ratio = frameBufferSize.Width / (float)frameBufferSize.Height;
 
     // Do our OpenGL drawing here
 

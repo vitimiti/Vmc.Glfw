@@ -127,13 +127,13 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Sets whether the window should have a transparent framebuffer.
+    /// Sets whether the window should have a transparent frameBuffer.
     /// </summary>
-    /// <param name="b"><see langword="true"/> to enable transparent framebuffer, <see langword="false"/> otherwise.</param>
+    /// <param name="b"><see langword="true"/> to enable transparent frameBuffer, <see langword="false"/> otherwise.</param>
     /// <returns>The current builder instance.</returns>
-    public WindowBuilder HasTransparentFramebuffer(bool b)
+    public WindowBuilder HasTransparentFrameBuffer(bool b)
     {
-        Unsafe.Glfw.WindowHint(Unsafe.Glfw.TransparentFramebuffer, b ? 1 : 0);
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.TransparentFrameBuffer, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
@@ -202,25 +202,25 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Sets whether the window's framebuffer should scale.
+    /// Sets whether the window's frameBuffer should scale.
     /// </summary>
-    /// <param name="b"><see langword="true"/> to scale the framebuffer, <see langword="false"/> otherwise.</param>
+    /// <param name="b"><see langword="true"/> to scale the frameBuffer, <see langword="false"/> otherwise.</param>
     /// <returns>The current builder instance.</returns>
-    public WindowBuilder ScalesFramebuffer(bool b)
+    public WindowBuilder ScalesFrameBuffer(bool b)
     {
-        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ScaleFramebuffer, b ? 1 : 0);
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.ScaleFrameBuffer, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
 
     /// <summary>
-    /// Sets whether the window should use a Retina framebuffer on Cocoa.
+    /// Sets whether the window should use a Retina frameBuffer on Cocoa.
     /// </summary>
-    /// <param name="b"><see langword="true"/> to use a Retina framebuffer, <see langword="false"/> otherwise.</param>
+    /// <param name="b"><see langword="true"/> to use a Retina frameBuffer, <see langword="false"/> otherwise.</param>
     /// <returns>The current builder instance.</returns>
-    public WindowBuilder WithCocoaRetinaFramebuffer(bool b)
+    public WindowBuilder WithCocoaRetinaFrameBuffer(bool b)
     {
-        Unsafe.Glfw.WindowHint(Unsafe.Glfw.CocoaRetinaFramebuffer, b ? 1 : 0);
+        Unsafe.Glfw.WindowHint(Unsafe.Glfw.CocoaRetinaFrameBuffer, b ? 1 : 0);
         Utilities.CheckError();
         return this;
     }
@@ -346,11 +346,11 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Sets the framebuffer bits for the window.
+    /// Sets the frameBuffer bits for the window.
     /// </summary>
-    /// <param name="color">The color specifying the framebuffer bits.</param>
+    /// <param name="color">The color specifying the frameBuffer bits.</param>
     /// <returns>The current builder instance.</returns>
-    public WindowBuilder WithFramebufferBits(Color color)
+    public WindowBuilder WithFrameBufferBits(Color color)
     {
         Unsafe.Glfw.WindowHint(Unsafe.Glfw.RedBits, color.R);
         Utilities.CheckError();

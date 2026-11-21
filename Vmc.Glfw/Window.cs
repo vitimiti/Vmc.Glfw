@@ -59,11 +59,11 @@ public delegate void WindowIconifyCallback(Window window, bool iconified);
 public delegate void WindowMaximizeCallback(Window window, bool maximized);
 
 /// <summary>
-/// Represents a callback for when the framebuffer size changes.
+/// Represents a callback for when the frameBuffer size changes.
 /// </summary>
 /// <param name="window">The window instance.</param>
-/// <param name="size">The new size of the framebuffer.</param>
-public delegate void FramebufferSizeCallback(Window window, Size size);
+/// <param name="size">The new size of the frameBuffer.</param>
+public delegate void FrameBufferSizeCallback(Window window, Size size);
 
 /// <summary>
 /// Represents a callback for when the window content scale changes.
@@ -263,16 +263,16 @@ public sealed unsafe class Window : IDisposable
     }
 
     /// <summary>
-    /// Gets the size of the framebuffer.
+    /// Gets the size of the frameBuffer.
     /// </summary>
     /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
     /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
-    public Size FramebufferSize
+    public Size FrameBufferSize
     {
         get
         {
             ThrowIfDisposed();
-            Unsafe.Glfw.GetFramebufferSize(Handle, out var width, out var height);
+            Unsafe.Glfw.GetFrameBufferSize(Handle, out var width, out var height);
             Utilities.CheckError();
             return new Size(width, height);
         }
@@ -533,26 +533,26 @@ public sealed unsafe class Window : IDisposable
     }
 
     /// <summary>
-    /// Gets or sets whether the window has a transparent framebuffer.
+    /// Gets or sets whether the window has a transparent frameBuffer.
     /// </summary>
     /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
     /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
-    public bool TransparentFramebuffer
+    public bool TransparentFrameBuffer
     {
         get
         {
             ThrowIfDisposed();
-            var transparentFramebuffer = Unsafe.Glfw.GetWindowAttrib(
+            var transparentFrameBuffer = Unsafe.Glfw.GetWindowAttrib(
                 Handle,
-                Unsafe.Glfw.TransparentFramebuffer
+                Unsafe.Glfw.TransparentFrameBuffer
             );
             Utilities.CheckError();
-            return transparentFramebuffer != 0;
+            return transparentFrameBuffer != 0;
         }
         set
         {
             ThrowIfDisposed();
-            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.TransparentFramebuffer, value ? 1 : 0);
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.TransparentFrameBuffer, value ? 1 : 0);
             Utilities.CheckError();
         }
     }
@@ -1078,7 +1078,7 @@ public sealed unsafe class Window : IDisposable
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static void FramebufferSizeCallbackHandler(
+    private static void FrameBufferSizeCallbackHandler(
         Unsafe.Glfw.Window* handle,
         int width,
         int height
@@ -1093,7 +1093,7 @@ public sealed unsafe class Window : IDisposable
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
         var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
-        callbacksWrapper?.FramebufferSizeCallback?.Invoke(unownedWindow, new Size(width, height));
+        callbacksWrapper?.FrameBufferSizeCallback?.Invoke(unownedWindow, new Size(width, height));
     }
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -1311,7 +1311,7 @@ public sealed unsafe class Window : IDisposable
             Unsafe.Glfw.SetWindowMaximizeCallback(Handle, null);
             Utilities.CheckError();
 
-            Unsafe.Glfw.SetFramebufferSizeCallback(Handle, null);
+            Unsafe.Glfw.SetFrameBufferSizeCallback(Handle, null);
             Utilities.CheckError();
 
             Unsafe.Glfw.SetWindowContentScaleCallback(Handle, null);
@@ -1649,18 +1649,18 @@ public sealed unsafe class Window : IDisposable
     }
 
     /// <summary>
-    /// Sets the framebuffer size callback for the window.
+    /// Sets the frameBuffer size callback for the window.
     /// </summary>
     /// <param name="callback">The callback to set, or <see langword="null"/> to remove the callback.</param>
     /// <exception cref="ObjectDisposedException">Thrown if the window has been disposed.</exception>
     /// <exception cref="NativeContextException">Thrown when a GLFW error occurs.</exception>
-    public void SetFramebufferSizeCallback(FramebufferSizeCallback? callback)
+    public void SetFrameBufferSizeCallback(FrameBufferSizeCallback? callback)
     {
         ThrowIfDisposed();
-        Callbacks.FramebufferSizeCallback = callback;
-        Unsafe.Glfw.SetFramebufferSizeCallback(
+        Callbacks.FrameBufferSizeCallback = callback;
+        Unsafe.Glfw.SetFrameBufferSizeCallback(
             Handle,
-            callback is null ? null : &FramebufferSizeCallbackHandler
+            callback is null ? null : &FrameBufferSizeCallbackHandler
         );
         Utilities.CheckError();
     }
@@ -1865,7 +1865,7 @@ public sealed unsafe class Window : IDisposable
         public WindowFocusCallback? FocusCallback { get; set; }
         public WindowIconifyCallback? IconifyCallback { get; set; }
         public WindowMaximizeCallback? MaximizeCallback { get; set; }
-        public FramebufferSizeCallback? FramebufferSizeCallback { get; set; }
+        public FrameBufferSizeCallback? FrameBufferSizeCallback { get; set; }
         public WindowContentScaleCallback? ContentScaleCallback { get; set; }
         public KeyCallback? KeyCallback { get; set; }
         public CharCallback? CharCallback { get; set; }

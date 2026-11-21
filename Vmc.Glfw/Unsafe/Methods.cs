@@ -203,9 +203,9 @@ internal static unsafe partial class Glfw
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial void SetWindowSize(Window* window, int width, int height);
 
-    [LibraryImport(DllName, EntryPoint = "glfwGetFramebufferSize")]
+    [LibraryImport(DllName, EntryPoint = "glfwGetFrameBufferSize")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    public static partial void GetFramebufferSize(Window* window, out int width, out int height);
+    public static partial void GetFrameBufferSize(Window* window, out int width, out int height);
 
     [LibraryImport(DllName, EntryPoint = "glfwGetWindowFrameSize")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -351,13 +351,13 @@ internal static unsafe partial class Glfw
             void> callback
     );
 
-    [LibraryImport(DllName, EntryPoint = "glfwSetFramebufferSizeCallback")]
+    [LibraryImport(DllName, EntryPoint = "glfwSetFrameBufferSizeCallback")]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     public static partial delegate* unmanaged[Cdecl]<
         Window*,
         int,
         int,
-        void> SetFramebufferSizeCallback(
+        void> SetFrameBufferSizeCallback(
         Window* window,
         delegate* unmanaged[Cdecl]<Window*, int, int, void> callback
     );
