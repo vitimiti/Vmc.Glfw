@@ -20,6 +20,15 @@ public delegate void WindowIconifyCallback(Window window, bool iconified);
 public delegate void WindowMaximizeCallback(Window window, bool maximized);
 public delegate void FramebufferSizeCallback(Window window, Size size);
 public delegate void WindowContentScaleCallback(Window window, Vector2 scale);
+public delegate void KeyCallback(
+    Window window,
+    Key key,
+    int scancode,
+    KeyAction action,
+    KeyModifiers mods
+);
+public delegate void CharCallback(Window window, uint codepoint);
+public delegate void CharModsCallback(Window window, uint codepoint, KeyModifiers mods);
 
 public sealed unsafe class Window : IDisposable
 {
@@ -511,7 +520,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.PositionCallback?.Invoke(unownedWindow, new Point(x, y));
     }
 
@@ -526,7 +535,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.SizeCallback?.Invoke(unownedWindow, new Size(width, height));
     }
 
@@ -541,7 +550,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.CloseCallback?.Invoke(unownedWindow);
     }
 
@@ -556,7 +565,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.RefreshCallback?.Invoke(unownedWindow);
     }
 
@@ -571,7 +580,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.FocusCallback?.Invoke(unownedWindow, focused != 0);
     }
 
@@ -586,7 +595,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.IconifyCallback?.Invoke(unownedWindow, iconified != 0);
     }
 
@@ -601,7 +610,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.MaximizeCallback?.Invoke(unownedWindow, maximized != 0);
     }
 
@@ -620,7 +629,7 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.FramebufferSizeCallback?.Invoke(unownedWindow, new Size(width, height));
     }
 
@@ -639,8 +648,63 @@ public sealed unsafe class Window : IDisposable
         var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
         var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
 
-        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((IntPtr)windowPtr).Target;
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
         callbacksWrapper?.ContentScaleCallback?.Invoke(unownedWindow, new Vector2(xscale, yscale));
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void KeyCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        Key key,
+        int scancode,
+        KeyAction action,
+        KeyModifiers mods
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.KeyCallback?.Invoke(unownedWindow, key, scancode, action, mods);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void CharCallbackHandler(Unsafe.Glfw.Window* handle, uint codepoint)
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.CharCallback?.Invoke(unownedWindow, codepoint);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static void CharModsCallbackHandler(
+        Unsafe.Glfw.Window* handle,
+        uint codepoint,
+        KeyModifiers mods
+    )
+    {
+        if (handle is null)
+        {
+            return;
+        }
+
+        var windowPtr = Unsafe.Glfw.GetWindowUserPointer(handle);
+        var unownedWindow = new Window((Unsafe.Glfw.Window*)windowPtr, isOwned: false);
+
+        var callbacksWrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)windowPtr).Target;
+        callbacksWrapper?.CharModsCallback?.Invoke(unownedWindow, codepoint, mods);
     }
 
     public void Dispose()
@@ -876,6 +940,30 @@ public sealed unsafe class Window : IDisposable
         Utilities.CheckError();
     }
 
+    public void SetKeyCallback(KeyCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.KeyCallback = callback;
+        Unsafe.Glfw.SetKeyCallback(Handle, &KeyCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetCharCallback(CharCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.CharCallback = callback;
+        Unsafe.Glfw.SetCharCallback(Handle, &CharCallbackHandler);
+        Utilities.CheckError();
+    }
+
+    public void SetCharModsCallback(CharModsCallback? callback)
+    {
+        ThrowIfDisposed();
+        Callbacks.CharModsCallback = callback;
+        Unsafe.Glfw.SetCharModsCallback(Handle, &CharModsCallbackHandler);
+        Utilities.CheckError();
+    }
+
     private sealed class CallbacksWrapper
     {
         public WindowPositionCallback? PositionCallback { get; set; }
@@ -887,5 +975,8 @@ public sealed unsafe class Window : IDisposable
         public WindowMaximizeCallback? MaximizeCallback { get; set; }
         public FramebufferSizeCallback? FramebufferSizeCallback { get; set; }
         public WindowContentScaleCallback? ContentScaleCallback { get; set; }
+        public KeyCallback? KeyCallback { get; set; }
+        public CharCallback? CharCallback { get; set; }
+        public CharModsCallback? CharModsCallback { get; set; }
     }
 }
