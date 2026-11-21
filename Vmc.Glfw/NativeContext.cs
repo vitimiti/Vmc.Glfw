@@ -40,6 +40,17 @@ public sealed class NativeContext : IDisposable
         }
     }
 
+    public bool RawMouseMotionSupported
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var rawMouseMotionSupported = Unsafe.Glfw.RawMouseMotionSupported();
+            Utilities.CheckError();
+            return rawMouseMotionSupported;
+        }
+    }
+
     internal NativeContext()
     {
         Unsafe.Glfw.Init();
@@ -130,5 +141,21 @@ public sealed class NativeContext : IDisposable
         ThrowIfDisposed();
         Unsafe.Glfw.PostEmptyEvent();
         Utilities.CheckError();
+    }
+
+    public unsafe string? GetKeyName(Key key, int scancode)
+    {
+        ThrowIfDisposed();
+        var keyName = Unsafe.Glfw.GetKeyName(key, scancode);
+        Utilities.CheckError();
+        return keyName is null ? null : Marshal.PtrToStringAnsi((nint)keyName);
+    }
+
+    public int GetKeyScancode(Key key)
+    {
+        ThrowIfDisposed();
+        var scancode = Unsafe.Glfw.GetKeyScancode(key);
+        Utilities.CheckError();
+        return scancode;
     }
 }
