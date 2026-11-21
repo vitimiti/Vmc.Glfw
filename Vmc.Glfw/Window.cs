@@ -382,6 +382,94 @@ public sealed unsafe class Window : IDisposable
         }
     }
 
+    public CursorInputMode CursorInputMode
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var mode = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.CursorConst);
+            Utilities.CheckError();
+            return (CursorInputMode)mode;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.CursorConst, (int)value);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool HasStickyKeys
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hasStickyKeys = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.StickyKeys);
+            Utilities.CheckError();
+            return hasStickyKeys != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.StickyKeys, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool HasStickyMouseButtons
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hasStickyMouseButtons = Unsafe.Glfw.GetWindowAttrib(
+                Handle,
+                Unsafe.Glfw.StickyMouseButtons
+            );
+            Utilities.CheckError();
+            return hasStickyMouseButtons != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.StickyMouseButtons, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool LocksKeyMods
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var locksKeyMods = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.LockKeyMods);
+            Utilities.CheckError();
+            return locksKeyMods != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.LockKeyMods, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
+    public bool HasRawMouseMotion
+    {
+        get
+        {
+            ThrowIfDisposed();
+            var hasRawMouseMotion = Unsafe.Glfw.GetWindowAttrib(Handle, Unsafe.Glfw.RawMouseMotion);
+            Utilities.CheckError();
+            return hasRawMouseMotion != 0;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Unsafe.Glfw.SetWindowAttrib(Handle, Unsafe.Glfw.RawMouseMotion, value ? 1 : 0);
+            Utilities.CheckError();
+        }
+    }
+
     internal Window(Unsafe.Glfw.Window* handle, bool isOwned = true)
     {
         Handle = handle;
