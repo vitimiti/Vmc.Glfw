@@ -161,15 +161,20 @@ public sealed unsafe class Monitor : IDisposable
 
         _disposed = true;
 
-        Unsafe.Glfw.SetMonitorUserPointer(Handle, null);
-        Utilities.CheckError();
-
-        Unsafe.Glfw.SetMonitorCallback(null);
-        Utilities.CheckError();
-
-        if (_gcHandle.IsAllocated)
+        try
         {
-            _gcHandle.Free();
+            Unsafe.Glfw.SetMonitorUserPointer(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetMonitorCallback(null);
+            Utilities.CheckError();
+        }
+        finally
+        {
+            if (_gcHandle.IsAllocated)
+            {
+                _gcHandle.Free();
+            }
         }
     }
 
