@@ -266,7 +266,7 @@ public sealed class NativeContext : IDisposable
         }
     }
 
-    public unsafe TDelegate GetProcAddress<TDelegate>(string procname)
+    public unsafe TDelegate GetProcess<TDelegate>(string procname)
         where TDelegate : Delegate
     {
         ThrowIfDisposed();
