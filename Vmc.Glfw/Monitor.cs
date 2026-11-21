@@ -168,6 +168,9 @@ public sealed unsafe class Monitor : IDisposable
 
             Unsafe.Glfw.SetMonitorCallback(null);
             Utilities.CheckError();
+
+            Unsafe.Glfw.SetMonitorCallback(null);
+            Utilities.CheckError();
         }
         finally
         {

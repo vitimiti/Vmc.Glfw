@@ -494,8 +494,8 @@ public sealed unsafe class Window : IDisposable
         get
         {
             ThrowIfDisposed();
-            double xpos,
-                ypos;
+            double xpos;
+            double ypos;
             Unsafe.Glfw.GetCursorPos(Handle, &xpos, &ypos);
             Utilities.CheckError();
             return new PointF((float)xpos, (float)ypos);
@@ -831,6 +831,57 @@ public sealed unsafe class Window : IDisposable
         try
         {
             Unsafe.Glfw.SetWindowUserPointer(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowPosCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowSizeCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowCloseCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowRefreshCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowFocusCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowIconifyCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowMaximizeCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetFramebufferSizeCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetWindowContentScaleCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetKeyCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetCharCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetCharModsCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetMouseButtonCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetCursorPosCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetCursorEnterCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetScrollCallback(Handle, null);
+            Utilities.CheckError();
+
+            Unsafe.Glfw.SetDropCallback(Handle, null);
             Utilities.CheckError();
 
             Unsafe.Glfw.DestroyWindow(Handle);
