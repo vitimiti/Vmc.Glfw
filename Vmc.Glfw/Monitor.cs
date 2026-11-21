@@ -15,8 +15,9 @@ public delegate void MonitorCallback(Monitor monitor, ConnectionEventType eventT
 
 public sealed unsafe class Monitor : IDisposable
 {
-    private static readonly Dictionary<Monitor, nint> MonitorHandles = [];
     private static readonly CallbacksWrapper Callbacks = new();
+
+    private readonly bool _isOwned;
 
     private GCHandle _gcHandle;
     private bool _disposed;
@@ -118,13 +119,13 @@ public sealed unsafe class Monitor : IDisposable
         }
     }
 
-    internal Monitor(Unsafe.Glfw.Monitor* handle)
+    internal Monitor(Unsafe.Glfw.Monitor* handle, bool isOwned = true)
     {
         Handle = handle;
+        _isOwned = isOwned;
         _gcHandle = GCHandle.Alloc(Callbacks);
         Unsafe.Glfw.SetMonitorUserPointer(handle, (void*)GCHandle.ToIntPtr(_gcHandle));
         Utilities.CheckError();
-        MonitorHandles[this] = (nint)handle;
     }
 
     private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(_disposed, this);
@@ -135,6 +136,11 @@ public sealed unsafe class Monitor : IDisposable
         ConnectionEventType eventType
     )
     {
+        if (monitor is null)
+        {
+            return;
+        }
+
         var userPtr = Unsafe.Glfw.GetMonitorUserPointer(monitor);
         var wrapper = (CallbacksWrapper?)GCHandle.FromIntPtr((nint)userPtr).Target;
         if (wrapper is null)
@@ -142,19 +148,13 @@ public sealed unsafe class Monitor : IDisposable
             return;
         }
 
-        foreach (var (mon, handle) in MonitorHandles)
-        {
-            if (handle == (nint)monitor)
-            {
-                wrapper.Callback?.Invoke(mon, eventType);
-                break;
-            }
-        }
+        var unownedMonitor = new Monitor(monitor, isOwned: false);
+        wrapper.Callback?.Invoke(unownedMonitor, eventType);
     }
 
     public void Dispose()
     {
-        if (_disposed)
+        if (_disposed || !_isOwned)
         {
             return;
         }
